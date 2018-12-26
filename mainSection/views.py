@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, reverse, HttpResponse, get_object
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.datastructures import MultiValueDictKeyError
-from .models import Shipment, ProductTypes, ShipmentDetail
+from .models import Shipment, ProductTypes, ShipmentDetail, Products
 from django.utils import timezone
 import json as simplejson
 from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails
@@ -89,12 +89,10 @@ def fillshipment(request):
     elif request.method =='GET' and 'shipmentID' in request.session:
         shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
         selectedShipment = get_object_or_404(Shipment,pk=request.session['shipmentID'])
-   
 
-        
     return render(request, '../templates/mainSection/fillshipment.html', {'selectedShipment':selectedShipment, 'productTypes': productType_list, 'shipments': shipment_list, 'productForm': productForm, 'shipmentDetails': shipmentItem_list, 'ShipmentForm': shipmentDetailForm})
 
-#this function will accept a shipmentID and return a shipmentItemList
+#This function will accept a shipmentID and return a shipmentItemList
 def getShipmentItemsList(shipmentId):
     
     if shipmentId is None:
@@ -107,9 +105,9 @@ def getShipmentItemsList(shipmentId):
 
 def saveproduct(request):
     if request.method == 'POST':
-        form = CreateProductForm(request.POST, request.FILES)
+        form = CreateProductForm(request.POST, request.FILES )
         shipmentDetialForm = CreateShipmentDetails(request.POST)
-       
+        
        
         # loading the product type that was assigned to the product
         productType = get_object_or_404(
@@ -120,11 +118,12 @@ def saveproduct(request):
 
         if form.is_valid() and shipmentDetialForm.is_valid():
             file = form.cleaned_data['img']
-            print(file.name)
             productObj = form.save(commit=False)
+            
             # assigning the product Type
             productObj.types = productType
-            productObj
+            productObj.productImg = request.FILES['img']
+            # productObj.productImage=file
             productObj.save()
            
             # creating the shipment detail Object

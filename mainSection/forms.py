@@ -36,7 +36,7 @@ class CreateProductForm(forms.ModelForm):
                'required': 'true', 'placeholder': 'Weight in gms'}
     ))
 
-    img = forms.FileField(widget=forms.FileInput(
+    img = forms.ImageField(widget=forms.FileInput(
         attrs={'class': 'form-control', 'id': 'productImage',
                'required': 'false'}
     ))

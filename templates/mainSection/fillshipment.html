@@ -50,13 +50,13 @@
 
                                     </div>
                                     <div class="col-md-3 mb-4">
-                                       Shipment Number - {{selectedShipment.shipmentNumber}}
+                                        Shipment Number - {{selectedShipment.shipmentNumber}}
                                     </div>
                                     <div class="col-md-3 mb-4">
-                                            Shipment date - {{selectedShipment.shipmentDate}}
+                                        Shipment date - {{selectedShipment.shipmentDate}}
                                     </div>
                                     <div class="col-md-2 mb-4">
-                                            Status - Open
+                                        Status - Open
                                     </div>
 
                                 </div>
@@ -66,7 +66,8 @@
 
                         </form>
                     </div>
-                    <form id='frmCreateShipmentDetails' action="{% url 'mainSection:saveproduct' %}" method="POST" enctype="multipart/form-data">
+                    <form id='frmCreateShipmentDetails' action="{% url 'mainSection:saveproduct' %}" method="POST"
+                        enctype="multipart/form-data">
                         {% csrf_token %}
                         <!-- header Section-->
                         <hr class="mb-4">
@@ -141,6 +142,7 @@
                                                 <th>Total Amount</th>
                                                 <th>Weight in gms</th>
                                                 <th>Vendor</th>
+                                                <th>Image</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -154,6 +156,12 @@
                                                 <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.totalAmount|intcomma}}</td>
                                                 <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.weight}}</td>
                                                 <td>{{shipmentdetail.product.vendor}}</td>
+
+                                                {% if shipmentdetail.product.productImg %}
+                                                <td><img src="{{shipmentdetail.product.productImg.url}}" height="150px;"></td>
+                                                {% else %}
+                                                <td></td>
+                                                {% endif %}
                                             </tr>
                                             {% endfor %}
                                         </tbody>
@@ -213,7 +221,7 @@
                 document.getElementById("btnLoad").disabled = false;
             }
         });
-        
+
         document.getElementById("btnAddItem").disabled = true;
         document.getElementById("btnLoad").disabled = true;
 
