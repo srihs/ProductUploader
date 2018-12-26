@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        Create
+        <small>Shipment</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Shipment</a></li>
+        <li class="active">Create Shipment</li>
+    </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="box box-default">
+        <div class="container">
+            <form id='frmCreateShipment' action="{% url 'mainSection:saveshipment' %}" method="POST">
+                {% csrf_token %}
+
+                <h4 style="text-align: center; margin-top: 2em">Shipment Details</h4>
+
+                <div class="box-body">
+                    <h6 style="text-align: center; font-weight: bold;">Shipment
+                        No: </h6>
+                    <div class="im-centered row">
+                        <label id="shipmentNumber" style="margin-right: auto; margin-left: auto;">{{form.shipmentNumber}}
+                        </label>
+                    </div>
+                    <h6 style="text-align: center; font-weight: bold;">Shipment Date:</h6>
+                    <div class="im-centered row">
+                        {{form.shipmentDate}}
+                    </div>
+                    <div class="d-flex flex-row justify-content-center align-items-center">
+                        <button id="btnCreateShipment" type="submit" class="btn btn-info"> Create Shipment</button>
+                    </div>
+                </div>
+
+            </form>
+            {% if messages %}
+            <div class="row">
+                <div class="d-flex flex-row justify-content-center align-items-center">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        <p>{{ message }}</p>
+                    </div>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {% endfor %}
+                </div>
+
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</section>
+<!-- /.content -->
+
+{% endblock content %}
+
+
+{% block scripts %}
+<script src="{% static '/js/select2.full.min.js' %}"></script>
+<script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
+
+<script>
+
+    $(function () {
+        //Initialize Select2 Elements
+        $('.select2').select2()
+        //Date picker - Two lines is to set the default date.
+        $("#datepicker").datepicker("setDate", new Date());
+        $('#datepicker').datepicker({ autoclose: true, });
+       
+    })
+</script>
+
+<script>
+    $(function () {
+
+        $('#tblProduct').DataTable({
+            'paging': true,
+            'lengthChange': false,
+            'searching': false,
+            'ordering': true,
+            'info': true,
+            'autoWidth': false
+        })
+    });
+</script>
+
+<script>
+    $("frmCreateShipment").submit(function (e) {
+    $("#fillShipmentLink").removeClass('btn btn-primary disabled');
+    });
+</script>
+{% endblock scripts %}
