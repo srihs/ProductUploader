@@ -94,7 +94,7 @@ def fillshipment(request):
         
     return render(request, '../templates/mainSection/fillshipment.html', {'selectedShipment':selectedShipment, 'productTypes': productType_list, 'shipments': shipment_list, 'productForm': productForm, 'shipmentDetails': shipmentItem_list, 'ShipmentForm': shipmentDetailForm})
 
-
+#this function will accept a shipmentID and return a shipmentItemList
 def getShipmentItemsList(shipmentId):
     
     if shipmentId is None:
@@ -102,6 +102,8 @@ def getShipmentItemsList(shipmentId):
     else:
         shipmentItem_list = ShipmentDetail.objects.filter(shipment=shipmentId).select_related('product').select_related('product__types')
     return shipmentItem_list
+
+    
 
 def saveproduct(request):
     if request.method == 'POST':
