@@ -57,7 +57,7 @@ class ShipmentDetail(models.Model):
     totalAmount  = models.PositiveIntegerField(null=True, blank=True)
     cost= models.DecimalField(decimal_places=2,max_digits=10,null=True, blank=True)
     billDate = models.DateField(default=timezone.now)
-    billNumber = models.CharField(max_length=100,null=True, blank=True)
+    billNumber = models.PositiveIntegerField(null=True, blank=True)
     archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)

@@ -63,6 +63,14 @@ class CreateShipmentDetails(forms.ModelForm):
                'required': 'true', 'placeholder': 'Qty'}
     ))
 
+    billNumber = forms.IntegerField(widget=forms.NumberInput(
+        attrs={'class': 'form-control', 'id': 'billNumber',
+               'placeholder': 'Bill Number'}
+    ))
+
+    billDate = forms.DateField(required=True, widget=forms.DateInput(
+        attrs={'class': 'form-control','style': 'text-align: center;', 'id': 'datepicker2','placeholder': 'Bill Date'}))
+
     class Meta:
         model = ShipmentDetail
-        fields = ['indPrice', 'qty']
+        fields = ['indPrice', 'qty' , 'billDate','billNumber']
