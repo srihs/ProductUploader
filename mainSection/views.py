@@ -68,7 +68,7 @@ def fillshipment(request):
     
 
     # Retrieving The shipments which are open to fill.
-    shipment_list = Shipment.objects.all()
+    shipment_list = Shipment.objects.filter(isClosed='False')
 
     # if the request if for a shipment that is selected in the dropdown the the following code block will execute
     if request.GET.get('shipmentDropDown'):

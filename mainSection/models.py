@@ -36,6 +36,7 @@ class Products(models.Model):
     sellingPrice  = models.DecimalField(decimal_places=2,max_digits=10,null=True, blank=True)
     productImg = models.ImageField(upload_to=settings.MEDIA_ROOT+'/%Y/%m/%d/', null=True, blank=True, max_length=5000)
     types= models.ForeignKey(ProductTypes, on_delete=models.CASCADE)
+    archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)
 
@@ -55,6 +56,7 @@ class ShipmentDetail(models.Model):
     qty  = models.PositiveIntegerField(null=True, blank=True)
     totalAmount  = models.PositiveIntegerField(null=True, blank=True)
     cost= models.DecimalField(decimal_places=2,max_digits=10,null=True, blank=True)
+    archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)
 
