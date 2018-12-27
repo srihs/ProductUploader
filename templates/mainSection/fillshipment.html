@@ -132,9 +132,10 @@
                         <div class="row">
                             <div class="box">
                                 <div class="box-body" style="margin: 15px;">
-                                    <table id="tblProduct" class="table table-bordered table-hover"  >
+                                    <table id="tblProduct" class="hover"  style="width:100%">
                                         <thead>
                                             <tr>
+                                                <th></th>
                                                 <th>SKU</th>
                                                 <th>Type</th>
                                                 <th>IND Price</th>
@@ -149,6 +150,10 @@
 
                                             {% for shipmentdetail in shipmentDetails %}
                                             <tr>
+                                                <td> <button class="btn btn-danger">
+                                                        <i class="fa fa-minus-circle"></i>
+                                                        
+                                                    </button></td>
                                                 <td>{{shipmentdetail.product.sku}}</td>
                                                 <td>{{shipmentdetail.product.types}}</td>
                                                 <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.indPrice|intcomma}}</td>
