@@ -117,12 +117,14 @@ def saveproduct(request):
         shipmentID = request.session['shipmentID']
 
         if form.is_valid() and shipmentDetialForm.is_valid():
-            file = form.cleaned_data['img']
             productObj = form.save(commit=False)
             
             # assigning the product Type
             productObj.types = productType
+
+            # assigning the product image
             productObj.productImg = request.FILES['img']
+
             # productObj.productImage=file
             productObj.save()
            
