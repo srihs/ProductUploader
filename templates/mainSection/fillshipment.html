@@ -29,12 +29,12 @@
                         Details </h6>
                     <div style="margin-right: auto; margin-left: auto;">
 
-                        <form action="{% url 'mainSection:fillshipment' %}" method="GET">
+                        <form id="frmfillShipment" action="{% url 'mainSection:fillshipment' %}" method="GET">
                             <div class="col-md-12 center">
                                 <div class="row">
                                     <div class="col-md-2 mb-4">
-                                        <select name="shipmentDropDown" id="shipmentDropDown" class="form-control">
-                                            <option>-Select-</option>
+                                        <select name="shipmentDropDown" id="shipmentDropDown" class="form-control" required>
+                                            <option value="">-Select-</option>
                                             {% for shipment in shipments %}
                                             {% if shipment.isClosed %}
                                             {% endif %}
@@ -50,7 +50,9 @@
 
                                     </div>
                                     <div class="col-md-3 mb-4">
-                                        Shipment Number - {{selectedShipment.shipmentNumber}}
+                                        Shipment Number - <label id="lblShipmentNumber">
+                                            {{selectedShipment.shipmentNumber}}</label>
+
                                     </div>
                                     <div class="col-md-3 mb-4">
                                         Shipment date - {{selectedShipment.shipmentDate}}
@@ -132,7 +134,7 @@
                         <div class="row">
                             <div class="box">
                                 <div class="box-body" style="margin: 15px;">
-                                    <table id="tblProduct" class="hover"  style="width:100%">
+                                    <table id="tblProduct" class="hover" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th></th>
@@ -152,7 +154,7 @@
                                             <tr>
                                                 <td> <button class="btn btn-danger">
                                                         <i class="fa fa-minus-circle"></i>
-                                                        
+
                                                     </button></td>
                                                 <td>{{shipmentdetail.product.sku}}</td>
                                                 <td>{{shipmentdetail.product.types}}</td>
@@ -210,29 +212,19 @@
 <script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
 
 <script>
-    // This funtion will determine if a shipment is loaded. if not, This function will disable the add product button.
+    
 
     // Executed when DOM is loaded
     $(document).ready(function () {
-
-        // Executed when select is changed
-        $("#shipmentDropDown").on('change', function () {
-            var x = this.options[this.selectedIndex].text;
-            if (x == '-Select-') {
-                document.getElementById("btnAddItem").disabled = true;
-                document.getElementById("btnLoad").disabled = true;
-                document.getElementById("divStatus").style.visibility = 'hidden';
-            } else {
-                document.getElementById("btnAddItem").disabled = false;
-                document.getElementById("btnLoad").disabled = false;
-                document.getElementById("divStatus").style.visibility = 'visible';
-            }
-        });
+        // This funtion will determine if a shipment is loaded. if not, This function will disable the add product button.
+        if ($("#lblShipmentNumber").text().trim().length > 2) {
+            document.getElementById("btnAddItem").disabled = false;
+            document.getElementById("divStatus").style.visibility = 'visible';
+        } else
+        {
 
         document.getElementById("btnAddItem").disabled = true;
-        document.getElementById("btnLoad").disabled = true;
-        document.getElementById("divStatus").style.visibility = 'hidden';
-
+        }
     });
 
     // This funtion is related to Datagrid Table
