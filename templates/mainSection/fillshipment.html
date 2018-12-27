@@ -138,6 +138,7 @@
                                         <thead>
                                             <tr>
                                                 <th></th>
+                                                <th></th>
                                                 <th>SKU</th>
                                                 <th>Type</th>
                                                 <th>IND Price</th>
@@ -152,8 +153,12 @@
 
                                             {% for shipmentdetail in shipmentDetails %}
                                             <tr>
-                                                <td> <button class="btn btn-danger">
-                                                        <i class="fa fa-minus-circle"></i>
+                                                <td> <button class="btn btn-warning" style="font-size: 12px;">
+                                                        <i class="fa fa-edit"> </i> Edit
+                                                        
+                                                    </button></td>
+                                                    <td> <button class="btn btn-danger" style="font-size: 12px;">
+                                                        <i class="fa fa-minus"> </i> Delete
 
                                                     </button></td>
                                                 <td>{{shipmentdetail.product.sku}}</td>
@@ -165,7 +170,7 @@
                                                 <td>{{shipmentdetail.product.vendor}}</td>
 
                                                 {% if shipmentdetail.product.productImg %}
-                                                <td><img src="{{shipmentdetail.product.productImg.url}}" width="150px;"></td>
+                                                <td><img src="{{shipmentdetail.product.productImg.url}}" width="100px;"></td>
                                                 {% else %}
                                                 <td></td>
                                                 {% endif %}
