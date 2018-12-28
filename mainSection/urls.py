@@ -13,6 +13,7 @@ urlpatterns = [
     path('fillshipment/',views.fillshipment,name="fillshipment"),
     path('saveproduct/',views.saveproduct,name="saveproduct"),
     path('viewhipment/',views.viewshipment,name="viewshipment"),
+    path('delete/<int:pk>',views.deleteshipment,name="deleteshipment"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

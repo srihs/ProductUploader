@@ -6,6 +6,8 @@
 {% block content %}
 
 <!-- Content Header (Page header) -->
+
+
 <section class="content-header">
     <h1>
         Fill
@@ -33,7 +35,8 @@
                             <div class="col-md-12 center">
                                 <div class="row">
                                     <div class="col-md-2 mb-4">
-                                        <select name="shipmentDropDown" id="shipmentDropDown" class="form-control" required>
+                                        <select name="shipmentDropDown" id="shipmentDropDown" class="form-control"
+                                            required>
                                             <option value="">-Select-</option>
                                             {% for shipment in shipments %}
                                             {% if shipment.isClosed %}
@@ -46,7 +49,8 @@
                                     </div>
 
                                     <div class="col-md-2 mb-4">
-                                        <input id="btnLoad" class="btn btn-primary" style="font-size: 14px;" type="submit" name="shipmentid" value="Load" />
+                                        <input id="btnLoad" class="btn btn-primary" style="font-size: 14px;" type="submit"
+                                            name="shipmentid" value="Load" />
 
                                     </div>
                                     <div class="col-md-3 mb-4">
@@ -130,74 +134,77 @@
                                     {{ShipmentForm.billDate}}
                                 </div>
                                 <div class="col-md-4 mb-4">
-                                    <button type="submit" id="btnAddItem" class="btn btn-primary" style="font-size: 14px;"> Add Product</button>
+                                    <button type="submit" id="btnAddItem" class="btn btn-primary" style="font-size: 14px;">
+                                        Add Product</button>
                                 </div>
                             </div>
 
                         </div>
-
-
-
-
-                        <div class="row">
-                            <div class="box">
-                                <div class="box-body" style="margin: 15px;">
-                                    <table id="tblProduct" class="hover" style="width:100%">
-                                        <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th></th>
-                                                <th>SKU</th>
-                                                <th>Type</th>
-                                                <th>IND Price</th>
-                                                <th>QTY</th>
-                                                <th>Total Amount</th>
-                                                <th>Weight in gms</th>
-                                                <th>Vendor</th>
-                                                <th>Image</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            {% for shipmentdetail in shipmentDetails %}
-                                            <tr>
-                                                <td> <button class="btn btn-warning" style="font-size: 12px;">
-                                                        <i class="fa fa-edit"> </i> Edit
-                                                        
-                                                    </button></td>
-                                                    <td> <button class="btn btn-danger" style="font-size: 12px;">
-                                                        <i class="fa fa-minus"> </i> Delete
-
-                                                    </button></td>
-                                                <td>{{shipmentdetail.product.sku}}</td>
-                                                <td>{{shipmentdetail.product.types}}</td>
-                                                <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.indPrice|intcomma}}</td>
-                                                <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.qty|intcomma}}</td>
-                                                <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.totalAmount|intcomma}}</td>
-                                                <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.weight}}</td>
-                                                <td>{{shipmentdetail.product.vendor}}</td>
-
-                                                {% if shipmentdetail.product.productImg %}
-                                                <td><img src="{{shipmentdetail.product.productImg.url}}" width="100px;"></td>
-                                                {% else %}
-                                                <td></td>
-                                                {% endif %}
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                        <tfoot>
-
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- /.box-body -->
-                        <!-- end of the Grid section -->
 
                     </form>
+
+
+                    <div class="row">
+                        <div class="box">
+                            <div class="box-body" style="margin: 15px;">
+                                <table id="tblProduct" class="hover" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th>SKU</th>
+                                            <th>Type</th>
+                                            <th>IND Price</th>
+                                            <th>QTY</th>
+                                            <th>Total Amount</th>
+                                            <th>Weight in gms</th>
+                                            <th>Vendor</th>
+                                            <th>Image</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        {% for shipmentdetail in shipmentDetails %}
+                                        <tr>
+                                            <td> <a href="" class="text-primary">
+                                                    <i class="fa fa-edit"> </i>
+
+                                                </a></td>
+                                            <td> <a href="{% url 'mainSection:deleteshipment' shipmentdetail.id %}"
+                                                    class="text-danger" onclick="return confirm('Are you sure?')">
+                                                    <i class="fa fa-times-circle"></i>
+
+                                                </a></td>
+                                            <td>{{shipmentdetail.product.sku}}</td>
+                                            <td>{{shipmentdetail.product.types}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.indPrice|intcomma}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.qty|intcomma}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.totalAmount|intcomma}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.weight}}</td>
+                                            <td>{{shipmentdetail.product.vendor}}</td>
+
+                                            {% if shipmentdetail.product.productImg %}
+                                            <td><img src="{{shipmentdetail.product.productImg.url}}" width="100px;"></td>
+                                            {% else %}
+                                            <td></td>
+                                            {% endif %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /.box-body -->
+                    <!-- end of the Grid section -->
+
+
                 </div>
+
 
                 {% if messages %}
                 <div class="row">
@@ -224,19 +231,18 @@
 <script src="{% static '/js/select2.full.min.js' %}"></script>
 <script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
 
-<script>
-    
 
+
+<script>
     // Executed when DOM is loaded
     $(document).ready(function () {
         // This funtion will determine if a shipment is loaded. if not, This function will disable the add product button.
         if ($("#lblShipmentNumber").text().trim().length > 2) {
             document.getElementById("btnAddItem").disabled = false;
             document.getElementById("divStatus").style.visibility = 'visible';
-        } else
-        {
+        } else {
 
-        document.getElementById("btnAddItem").disabled = true;
+            document.getElementById("btnAddItem").disabled = true;
         }
     });
 
@@ -252,6 +258,9 @@
             'autoWidth': true
         })
     });
+
+
+
 </script>
 
 <script>
@@ -260,8 +269,14 @@
         //Initialize Select2 Elements
         $('.select2').select2()
         $('#datepicker2').datepicker({ autoclose: true, });
-       
+
     })
+</script>
+
+<script>
+    $('#frmfillShipment').submit(function () {
+        document.getElementById("loading").style.display = "visible";
+    });
 </script>
 
 {% endblock scripts %}

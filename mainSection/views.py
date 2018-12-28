@@ -6,6 +6,7 @@ from .models import Shipment, ProductTypes, ShipmentDetail, Products
 from django.utils import timezone
 import json as simplejson
 from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails
+from  django.http import QueryDict
 
 from django.contrib.auth import (
     authenticate,
@@ -41,6 +42,8 @@ def createshipment(request):
     return render(request, '../templates/mainSection/createshipment.html', {'form': form})
 
 
+
+
 def saveshipment(request):
     if request.method == 'POST':
         form = CreateShipmentForm(request.POST)
@@ -53,6 +56,7 @@ def saveshipment(request):
 
 def viewshipment(request):
     return render(request, '../templates/mainSection/viewshipment.html')
+
 
 
 def fillshipment(request):
@@ -92,13 +96,15 @@ def fillshipment(request):
 
     return render(request, '../templates/mainSection/fillshipment.html', {'selectedShipment':selectedShipment, 'productTypes': productType_list, 'shipments': shipment_list, 'productForm': productForm, 'shipmentDetails': shipmentItem_list, 'ShipmentForm': shipmentDetailForm})
 
+
+
 #This function will accept a shipmentID and return a shipmentItemList
 def getShipmentItemsList(shipmentId):
     
     if shipmentId is None:
         shipmentItem_list = None
     else:
-        shipmentItem_list = ShipmentDetail.objects.filter(shipment=shipmentId).select_related('product').select_related('product__types')
+        shipmentItem_list = ShipmentDetail.objects.filter(shipment=shipmentId,archived='0').select_related('product').select_related('product__types')
     return shipmentItem_list
 
     
@@ -139,3 +145,16 @@ def saveproduct(request):
             messages.error(request, form.errors)
 
         return redirect('mainSection:fillshipment')
+
+
+
+def deleteshipment(request,pk):
+    
+    objShipmentDetail= get_object_or_404(ShipmentDetail, pk=pk)    
+    if request.method=='GET':
+        # we are setting a parameter to mark the item as deleted.
+        objShipmentDetail.archived = True
+        print(objShipmentDetail.archived)
+        objShipmentDetail.save()
+        
+    return redirect('mainSection:fillshipment')
