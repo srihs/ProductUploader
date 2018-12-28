@@ -150,41 +150,38 @@
                                 <table id="tblProduct" class="hover" style="width:100%">
                                     <thead>
                                         <tr>
-                                            <th></th>
-                                            <th></th>
-                                            <th>SKU</th>
-                                            <th>Type</th>
-                                            <th>IND Price</th>
-                                            <th>QTY</th>
-                                            <th>Total Amount</th>
-                                            <th>Weight in gms</th>
-                                            <th>Vendor</th>
-                                            <th>Image</th>
+                                            
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;"></th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">SKU</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Type</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">IND Price</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">QTY</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Total Amount</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Weight in gms</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Vendor</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Image</th>
                                         </tr>
                                     </thead>
                                     <tbody>
 
                                         {% for shipmentdetail in shipmentDetails %}
                                         <tr>
-                                            <td> <a href="" class="text-primary">
-                                                    <i class="fa fa-edit"> </i>
-
-                                                </a></td>
+                                          
                                             <td> <a href="{% url 'mainSection:deleteshipment' shipmentdetail.id %}"
-                                                    class="text-danger" onclick="return confirm('Are you sure?')">
+                                                    class="text-danger" onclick="return confirm('You are about to delete. Are you sure?')">
                                                     <i class="fa fa-times-circle"></i>
 
                                                 </a></td>
-                                            <td>{{shipmentdetail.product.sku}}</td>
-                                            <td>{{shipmentdetail.product.types}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.sku}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.types}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.indPrice|intcomma}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.qty|intcomma}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.totalAmount|intcomma}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.weight}}</td>
-                                            <td>{{shipmentdetail.product.vendor}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.vendor}}</td>
 
                                             {% if shipmentdetail.product.productImg %}
-                                            <td><img src="{{shipmentdetail.product.productImg.url}}" width="100px;"></td>
+                                            <td><p style="text-align:right"><img src="{{shipmentdetail.product.productImg.url}}" width="100px;"></p></td>
                                             {% else %}
                                             <td></td>
                                             {% endif %}
@@ -204,23 +201,108 @@
 
 
                 </div>
+                <!-- Model For Edit -->
+                <form>
 
 
-                {% if messages %}
-                <div class="row">
-                    <div class="d-flex flex-row justify-content-center align-items-center">
-                        {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}" role="alert">
-                            <p>{{ message }}</p>
+                    <div id="editModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Edit Product</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+
+                                    <div class="col-md-12 center">
+                                        <h5 class="mb-3" id="exampleModalLabel">Product Details</h5>
+
+                                        <div class="row">
+                                            <div class="col-md-2 mb-4">
+                                                {{productForm.sku}}
+                                            </div>
+
+                                            <div class="col-md-2 mb-4">
+                                                {{productForm.weight}}
+
+                                            </div>
+
+                                            <div class="col-md-2 mb-4">
+
+                                                <select name="productTypeEdit" class="form-control">
+                                                    <option>-Select-</option>
+                                                    {% for productType in productTypes %}
+                                                    <option value='{{ productType.id}}'>{{productType.productType}}</option>
+                                                    {% endfor %}
+                                                </select>
+
+                                            </div>
+                                            <div class="col-md-3 mb-4">
+                                                {{productForm.vendor}}
+                                            </div>
+                                            <div class="col-md-3 mb-4">
+                                                {{productForm.img}}
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-12 center">
+                                        <h5 class="mb-3" id="exampleModalLabel">Shipping Details</h5>
+
+                                        <div class="row">
+
+                                            <div class="col-md-2 mb-4">
+                                                {{ShipmentForm.indPrice}}
+
+                                            </div>
+
+                                            <div class="col-md-2 mb-4">
+                                                {{ShipmentForm.qty}}
+                                            </div>
+
+                                            <div class="col-md-2 mb-4">
+                                                {{ShipmentForm.billNumber}}
+                                            </div>
+
+                                            <div class="col-md-2 mb-4">
+                                                {{ShipmentForm.billDate}}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </div>
                         </div>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        {% endfor %}
-                    </div>
 
+                </form>
+
+            </div>
+
+            {% if messages %}
+            <div class="row">
+                <div class="d-flex flex-row justify-content-center align-items-center">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        <p>{{ message }}</p>
+                    </div>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {% endfor %}
                 </div>
-                {% endif %}
+
+            </div>
+            {% endif %}
 </section>
 <!-- /.content -->
 
@@ -234,6 +316,12 @@
 
 
 <script>
+    var elem = document.querySelector('.modal')
+    var instance = M.Modal.init(elem)
+
+    var elem = document.querySelector('select')
+    var instance = M.FormSelect.init(elem)
+
     // Executed when DOM is loaded
     $(document).ready(function () {
         // This funtion will determine if a shipment is loaded. if not, This function will disable the add product button.

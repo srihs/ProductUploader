@@ -158,3 +158,5 @@ def deleteshipment(request,pk):
         objShipmentDetail.save()
         
     return redirect('mainSection:fillshipment')
+
+  
