@@ -14,6 +14,7 @@ urlpatterns = [
     path('saveproduct/',views.saveproduct,name="saveproduct"),
     path('viewhipment/',views.viewshipment,name="viewshipment"),
     path('delete/<int:pk>',views.deleteshipment,name="deleteshipment"),
+    path('finalizeshipment/',views.finalizeshipment,name="finalizeshipment"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

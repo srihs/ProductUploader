@@ -11,6 +11,7 @@ class Shipment(models.Model):
     shipmentNumber = models.CharField(max_length=50)
     shipmentDate = models.DateField()
     isClosed = models.BooleanField(default='False')
+    isFinalized = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)
 

@@ -60,7 +60,6 @@ def viewshipment(request):
 
 
 def fillshipment(request):
-    
     #initializing objects
     productForm = CreateProductForm()
     shipmentDetailForm = CreateShipmentDetails()
@@ -72,7 +71,7 @@ def fillshipment(request):
     
 
     # Retrieving The shipments which are open to fill.
-    shipment_list = Shipment.objects.filter(isClosed='False')
+    shipment_list = Shipment.objects.filter(isClosed='False',isFinalized='0')
 
     # if the request if for a shipment that is selected in the dropdown the the following code block will execute
     if request.GET.get('shipmentDropDown'):
@@ -91,8 +90,12 @@ def fillshipment(request):
         
     # This block will handel the requests with out shipping Id
     elif request.method =='GET' and 'shipmentID' in request.session:
+        print('Methanata awa')
         shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
         selectedShipment = get_object_or_404(Shipment,pk=request.session['shipmentID'])
+    else:
+        shipmentItem_list = None
+        selectedShipment = None
 
     return render(request, '../templates/mainSection/fillshipment.html', {'selectedShipment':selectedShipment, 'productTypes': productType_list, 'shipments': shipment_list, 'productForm': productForm, 'shipmentDetails': shipmentItem_list, 'ShipmentForm': shipmentDetailForm})
 
@@ -103,6 +106,7 @@ def getShipmentItemsList(shipmentId):
     
     if shipmentId is None:
         shipmentItem_list = None
+        selectedShipment = None
     else:
         shipmentItem_list = ShipmentDetail.objects.filter(shipment=shipmentId,archived='0').select_related('product').select_related('product__types')
     return shipmentItem_list
@@ -149,14 +153,25 @@ def saveproduct(request):
 
 
 def deleteshipment(request,pk):
-    
     objShipmentDetail= get_object_or_404(ShipmentDetail, pk=pk)    
     if request.method=='GET':
         # we are setting a parameter to mark the item as deleted.
         objShipmentDetail.archived = True
-        print(objShipmentDetail.archived)
         objShipmentDetail.save()
         
     return redirect('mainSection:fillshipment')
 
-  
+
+def finalizeshipment(request):
+
+    if 'shipmentID' in request.session:
+        objShipment = get_object_or_404(Shipment, pk=request.session['shipmentID'])
+
+    if request.method=="POST":
+        objShipment.isFinalized= True
+        objShipment.save()
+        #clearing the session form the system. so the New id will be facilitated
+        request.session.flush()
+
+    return redirect('mainSection:fillshipment')
+
