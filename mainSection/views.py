@@ -175,7 +175,7 @@ def finalizeshipment(request):
          #clearing the session form the system. so the New id will be facilitated
          request.session.flush()
         else:
-            messages.error(request,'This Shipment has no products assigned.')
+            messages.error(request,'This Shipment has no products assigned. Please add products before finalize the shipment.')
 
     return redirect('mainSection:fillshipment')
 

@@ -41,8 +41,8 @@
                         <div style="margin-left:auto; margin-right:auto;">
                             {% for message in messages %}
                             <div class="alert alert-danger alert-dismissible">
-                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                                <strong>Error!</strong> {{ message }}
+                                <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <strong>Error! </strong> <p>{{ message }}</p>
                             </div>
                         </div>
                         {% endfor %}
@@ -179,15 +179,17 @@
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;"></th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">SKU</th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">Type</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">
-                                                Price</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Weight
+                                                    in gms</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Price</th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">QTY</th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">Total
                                                 Amount</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Weight
-                                                in gms</th>
+                                            
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">Vendor</th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">Image</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill Number</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -202,10 +204,11 @@
                                                 </a></td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.sku}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.types}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.weight}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.indPrice|intcomma}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.qty|intcomma}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.totalAmount|intcomma}}</td>
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.weight}}</td>
+                                            
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.vendor}}</td>
 
                                             {% if shipmentdetail.product.productImg %}
@@ -216,6 +219,8 @@
                                             {% else %}
                                             <td></td>
                                             {% endif %}
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.billNumber}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.billDate}}</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
