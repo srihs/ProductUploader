@@ -22,6 +22,7 @@ def home(request):
     return render(request, '../templates/mainSection/home.html')
 
 
+#This method will handle the createshipment request
 def createshipment(request):
     #clearing the session form the system. so the New id will be facilitated
     request.session.flush()
@@ -43,7 +44,7 @@ def createshipment(request):
 
 
 
-
+#This method will handle the Save shipment request
 def saveshipment(request):
     if request.method == 'POST':
         form = CreateShipmentForm(request.POST)
@@ -58,7 +59,7 @@ def viewshipment(request):
     return render(request, '../templates/mainSection/viewshipment.html')
 
 
-
+#This method will handle the fillshipment request
 def fillshipment(request):
     #initializing objects
     productForm = CreateProductForm()
@@ -112,7 +113,7 @@ def getShipmentItemsList(shipmentId):
     return shipmentItem_list
 
     
-
+#This method will handle the save product request
 def saveproduct(request):
     if request.method == 'POST':
         form = CreateProductForm(request.POST, request.FILES )
@@ -151,8 +152,8 @@ def saveproduct(request):
         return redirect('mainSection:fillshipment')
 
 
-
-def deleteshipment(request,pk):
+#This method will handle the delete shipmentdetail request
+def deleteshipmentdetail(request,pk):
     objShipmentDetail= get_object_or_404(ShipmentDetail, pk=pk)    
     if request.method=='GET':
         # we are setting a parameter to mark the item as deleted.
@@ -161,17 +162,20 @@ def deleteshipment(request,pk):
         
     return redirect('mainSection:fillshipment')
 
-
+#This method will handle the finalize shipment Request
 def finalizeshipment(request):
-
     if 'shipmentID' in request.session:
         objShipment = get_object_or_404(Shipment, pk=request.session['shipmentID'])
 
     if request.method=="POST":
-        objShipment.isFinalized= True
-        objShipment.save()
-        #clearing the session form the system. so the New id will be facilitated
-        request.session.flush()
+        shipmentItem_list = getShipmentItemsList(objShipment.id)
+        if shipmentItem_list.count() > 0:
+         objShipment.isFinalized= True
+         objShipment.save()
+         #clearing the session form the system. so the New id will be facilitated
+         request.session.flush()
+        else:
+            messages.error(request,'This Shipment has no products assigned.')
 
     return redirect('mainSection:fillshipment')
 
