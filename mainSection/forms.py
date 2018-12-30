@@ -74,3 +74,5 @@ class CreateShipmentDetails(forms.ModelForm):
     class Meta:
         model = ShipmentDetail
         fields = ['indPrice', 'qty' , 'billDate','billNumber']
+
+

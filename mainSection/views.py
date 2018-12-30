@@ -56,7 +56,29 @@ def saveshipment(request):
 
 
 def viewshipment(request):
-    return render(request, '../templates/mainSection/viewshipment.html')
+    # Retrieving The shipments which are open to fill.
+    shipment_list = Shipment.objects.all()
+    shipmentItem_list =None
+
+    if request.method == 'GET':
+        return render(request, '../templates/mainSection/viewshipment.html',{'shipments': shipment_list})
+
+    if request.method=='POST':
+        # if the request if for a shipment that is selected in the dropdown the the following code block will execute
+        if request.POST['shipmentDropDown']: 
+           
+            #getting the shipmentID
+            shipmentID = request.POST['shipmentDropDown']
+              
+            #getting the shipment List
+            shipmentItem_list = getShipmentItemsList(shipmentID)
+            
+        else:
+            messages.error(request,"Something went wrong.")
+        
+        return render(request, '../templates/mainSection/viewshipment.html',{'shipments': shipment_list, 'shipmentDetails': shipmentItem_list })
+
+
 
 
 #This method will handle the fillshipment request
@@ -91,7 +113,6 @@ def fillshipment(request):
         
     # This block will handel the requests with out shipping Id
     elif request.method =='GET' and 'shipmentID' in request.session:
-        print('Methanata awa')
         shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
         selectedShipment = get_object_or_404(Shipment,pk=request.session['shipmentID'])
     else:
