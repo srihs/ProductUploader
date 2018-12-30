@@ -20,5 +20,13 @@ def login_view(request):
         if next:
             return redirect(reverse('home'))
         context={'user':user}
+        print(context)
         return redirect('home/',context)
     return render(request, 'authSection/login.html', {'form': form})
+
+
+def logout_view(request):
+    logout(request)
+    form = userLoginForm()
+    request.user.sessions.delete()
+    return render (request,'authSection/login.html', {'form': form})

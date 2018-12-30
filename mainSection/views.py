@@ -18,16 +18,17 @@ from django.contrib.auth import (
 @login_required
 def home(request):
     #clearing the session form the system. so the New id will be facilitated
-    request.session.flush()
     return render(request, '../templates/mainSection/home.html')
 
 
 #This method will handle the createshipment request
 def createshipment(request):
-    #clearing the session form the system. so the New id will be facilitated
-    request.session.flush()
-
     if request.method == "GET":
+        print(request.user)
+          #clearing the session form the system. so the New id will be facilitated
+        request.session['shipmentID'] =None
+        request.session.modified = True
+
         # shipmentNumber is defined by 'SHN-000' + next Id in the shipment Table
         try:
              # trying to retrive the next primaryKey
@@ -40,7 +41,7 @@ def createshipment(request):
         form = CreateShipmentForm(
             initial={'shipmentNumber': 'SHN-000' + str(nextId)})
 
-    return render(request, '../templates/mainSection/createshipment.html', {'form': form})
+    return render(request, '../templates/mainSection/createshipment.html', {'form': form,'user': request.user})
 
 
 
@@ -114,7 +115,12 @@ def fillshipment(request):
     # This block will handel the requests with out shipping Id
     elif request.method =='GET' and 'shipmentID' in request.session:
         shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
-        selectedShipment = get_object_or_404(Shipment,pk=request.session['shipmentID'])
+        #since the session.flush is voided due to the the authentication issue, ShipmentID is set to null in the sessio variable
+        #therefor need to check for null.
+        if request.session['shipmentID'] is None:
+            selectedShipment = None
+        else:
+            selectedShipment = Shipment.objects.get(id=request.session['shipmentID'])
     else:
         shipmentItem_list = None
         selectedShipment = None
@@ -128,7 +134,6 @@ def getShipmentItemsList(shipmentId):
     
     if shipmentId is None:
         shipmentItem_list = None
-        selectedShipment = None
     else:
         shipmentItem_list = ShipmentDetail.objects.filter(shipment=shipmentId,archived='0').select_related('product').select_related('product__types')
     return shipmentItem_list
@@ -194,7 +199,8 @@ def finalizeshipment(request):
          objShipment.isFinalized= True
          objShipment.save()
          #clearing the session form the system. so the New id will be facilitated
-         request.session.flush()
+         request.session['shipmentID'] =None
+         request.session.modified = True
         else:
             messages.error(request,'This Shipment has no products assigned. Please add products before finalize the shipment.')
 
