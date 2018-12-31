@@ -52,10 +52,10 @@
                             {% csrf_token %}
                             <div class="col-md-12 center">
                                 <div class="row">
-                                    <div class="col-md-2 mb-4">
+                                    <div class="col-md-3 mb-6">
                                         <select name="shipmentDropDown" id="shipmentDropDown" class="form-control"
                                             required>
-                                            <option value="">-Select-</option>
+                                            <option value="">-Shipment Number-</option>
                                             {% for shipment in shipments %}
                                             {% if shipment.isClosed %}
                                             {% endif %}
@@ -78,6 +78,39 @@
 
                     <div class="row">
                         <div class="box">
+                            
+                                    <div class="col-md-12 center" style="margin-left:auto; margin-right:auto; margin-top: 1em">
+                                            <h5 style="text-align: center; font-weight: bold; margin-top: 1em">Shipment
+                                                    Details </h5>
+                                            <div class="row" style="margin-left:auto; margin-right:auto; margin-top: 2em">
+                                                <div class="col-md-3 mb-4">
+                                                     <p> <strong> Shipment No - 
+                                                        {{selectedShipment.shipmentNumber}}</strong> </p>
+                                                </div>
+            
+                                                <div class="col-md-3 mb-4">
+                                                        <strong>   Shipment Date - 
+                                                        {{selectedShipment.shipmentDate}} </strong>
+                                                </div>
+            
+            
+                                                <div class="col-md-3 mb-4">
+                                                        <strong>   Shipment Total - 
+                                                        {{shipmentTotal|intcomma}}</strong>
+            
+                                                </div>
+                                                <div class="col-md-3 mb-4">
+                                                        <strong>    Shipment Qty - {{shipmentTotalQty|intcomma}} </strong>
+                                                </div>
+            
+            
+            
+                                            </div>
+            
+            
+                                        </div>
+            
+
                             <div class="box-body" style="margin: 15px;">
                                 <table id="tblProduct" class="hover" style="width:100%">
                                     <thead>

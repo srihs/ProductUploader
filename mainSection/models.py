@@ -22,6 +22,8 @@ class Shipment(models.Model):
 
     def __str__(self):
         return self.shipmentNumber
+    
+    
 
  
 class ProductTypes(models.Model):
@@ -74,6 +76,7 @@ class ShipmentDetail(models.Model):
     @property
     def totalAmount(self):
         return self.indPrice * self.qty
+    
         
 
     
