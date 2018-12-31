@@ -2,8 +2,12 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import AbstractUser
 
-
+class User(AbstractUser):
+    is_buyer = models.BooleanField(default=False)
+    is_officeUser = models.BooleanField(default=False)
+    is_storeUser = models.BooleanField(default=False)
 
 
 class Shipment(models.Model):
@@ -12,6 +16,7 @@ class Shipment(models.Model):
     shipmentDate = models.DateField()
     isClosed = models.BooleanField(default='False')
     isFinalized = models.BooleanField(default='False')
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE)
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)
 

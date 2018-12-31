@@ -6,6 +6,7 @@ from .models import Shipment, ProductTypes, ShipmentDetail, Products
 from django.utils import timezone
 import json as simplejson
 from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails
+from django.contrib.auth.models import AbstractUser
 from  django.http import QueryDict
 
 from django.contrib.auth import (
@@ -52,7 +53,10 @@ def saveshipment(request):
     if request.method == 'POST':
         form = CreateShipmentForm(request.POST)
         if form.is_valid():
-            instance = form.save()
+            objShipment = form.save(commit=False)
+            print(request.user.id)
+            objShipment.buyer = request.user
+            objShipment.save()
         else:
             messages.error(request, form.errors)
         return redirect('mainSection:fillshipment')
@@ -61,7 +65,7 @@ def saveshipment(request):
 @login_required
 def viewshipment(request):
     # Retrieving The shipments which are open to fill.
-    shipment_list = Shipment.objects.all()
+    shipment_list = Shipment.objects.filter(buyer=request.user)
     shipmentItem_list =None
 
     if request.method == 'GET':
@@ -98,8 +102,8 @@ def fillshipment(request):
     productType_list = ProductTypes.objects.all()
     
 
-    # Retrieving The shipments which are open to fill.
-    shipment_list = Shipment.objects.filter(isClosed='False',isFinalized='0')
+    # Retrieving The shipments which are open to fill. Only loged in users orders will be listed.
+    shipment_list = Shipment.objects.filter(isClosed='False',isFinalized='0',buyer=request.user)
 
     # if the request if for a shipment that is selected in the dropdown the the following code block will execute
     if request.GET.get('shipmentDropDown'):
@@ -117,14 +121,11 @@ def fillshipment(request):
         request.session['shipmentID'] = selectedShipment.id
         
     # This block will handel the requests with out shipping Id
-    elif request.method =='GET' and request is not None and 'shipmentID' in request.session:
+    elif request.method =='GET' and request is not None and 'shipmentID' in request.session and request.session['shipmentID'] is not None :
         shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
         #since the session.flush is voided due to the the authentication issue, ShipmentID is set to null in the sessio variable
         #therefor need to check for null.
-        if request.session['shipmentID'] is None:
-            selectedShipment = None
-        else:
-            selectedShipment = Shipment.objects.get(id=request.session['shipmentID'])
+        selectedShipment = Shipment.objects.get(id=request.session['shipmentID'])
     else:
         shipmentItem_list = None
         selectedShipment = None
@@ -134,7 +135,6 @@ def fillshipment(request):
 
 
 #This function will accept a shipmentID and return a shipmentItemList
-@login_required
 def getShipmentItemsList(shipmentId):
     
     if shipmentId is None:
@@ -194,6 +194,7 @@ def deleteshipmentdetail(request,pk):
         objShipmentDetail.save()
         
     return redirect('mainSection:fillshipment')
+
 
 #This method will handle the finalize shipment Request
 @login_required

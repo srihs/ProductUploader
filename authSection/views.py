@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,reverse
 from django import forms
+from django.contrib import messages
 from django.contrib.auth import (
     authenticate,
     get_user_model,
@@ -23,6 +24,9 @@ def login_view(request):
         context={'user':user}
         print(context)
         return redirect('home/',context)
+    else:
+        messages.error(request, form.errors)
+
     return render(request, 'authSection/login.html', {'form': form})
 
 

@@ -150,3 +150,5 @@ LOGIN_URL = 'authSection:login'
 LOGOUT_URL = 'logout'
 
 LOGOUT_REDIRECT_URL = 'home'
+
+AUTH_USER_MODEL ='mainSection.User'
