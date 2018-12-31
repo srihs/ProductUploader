@@ -145,8 +145,8 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
 
 
 
-LOGOUT_URL = 'logout'
+LOGIN_URL = 'authSection:login'
 
-LOGIN_REDIRECT_URL = 'home'
+LOGOUT_URL = 'logout'
 
 LOGOUT_REDIRECT_URL = 'home'

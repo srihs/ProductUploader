@@ -17,8 +17,9 @@ def login_view(request):
         password = form.cleaned_data.get('password')
         user = authenticate(username=username,password=password)
         login(request,user)
-        if next:
-            return redirect(reverse('home'))
+        #when the 'next' parameter is not defined in the GET, it will be an empty string,
+        #so this line will redirect to the next if defined or to home if not.
+        return HttpResponseRedirect(request.POST.get('next') or reverse('mainSection:home'))
         context={'user':user}
         print(context)
         return redirect('home/',context)
@@ -28,5 +29,5 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     form = userLoginForm()
-    request.user.sessions.delete()
+    request.session.flush()
     return render (request,'authSection/login.html', {'form': form})

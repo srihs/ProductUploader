@@ -22,6 +22,7 @@ def home(request):
 
 
 #This method will handle the createshipment request
+@login_required
 def createshipment(request):
     if request.method == "GET":
         print(request.user)
@@ -46,6 +47,7 @@ def createshipment(request):
 
 
 #This method will handle the Save shipment request
+@login_required
 def saveshipment(request):
     if request.method == 'POST':
         form = CreateShipmentForm(request.POST)
@@ -56,6 +58,7 @@ def saveshipment(request):
         return redirect('mainSection:fillshipment')
 
 
+@login_required
 def viewshipment(request):
     # Retrieving The shipments which are open to fill.
     shipment_list = Shipment.objects.all()
@@ -83,6 +86,7 @@ def viewshipment(request):
 
 
 #This method will handle the fillshipment request
+@login_required
 def fillshipment(request):
     #initializing objects
     productForm = CreateProductForm()
@@ -113,7 +117,7 @@ def fillshipment(request):
         request.session['shipmentID'] = selectedShipment.id
         
     # This block will handel the requests with out shipping Id
-    elif request.method =='GET' and 'shipmentID' in request.session:
+    elif request.method =='GET' and request is not None and 'shipmentID' in request.session:
         shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
         #since the session.flush is voided due to the the authentication issue, ShipmentID is set to null in the sessio variable
         #therefor need to check for null.
@@ -130,6 +134,7 @@ def fillshipment(request):
 
 
 #This function will accept a shipmentID and return a shipmentItemList
+@login_required
 def getShipmentItemsList(shipmentId):
     
     if shipmentId is None:
@@ -140,6 +145,7 @@ def getShipmentItemsList(shipmentId):
 
     
 #This method will handle the save product request
+@login_required
 def saveproduct(request):
     if request.method == 'POST':
         form = CreateProductForm(request.POST, request.FILES )
@@ -179,6 +185,7 @@ def saveproduct(request):
 
 
 #This method will handle the delete shipmentdetail request
+@login_required
 def deleteshipmentdetail(request,pk):
     objShipmentDetail= get_object_or_404(ShipmentDetail, pk=pk)    
     if request.method=='GET':
@@ -189,6 +196,7 @@ def deleteshipmentdetail(request,pk):
     return redirect('mainSection:fillshipment')
 
 #This method will handle the finalize shipment Request
+@login_required
 def finalizeshipment(request):
     if 'shipmentID' in request.session:
         objShipment = get_object_or_404(Shipment, pk=request.session['shipmentID'])
