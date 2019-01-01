@@ -83,6 +83,7 @@ DATABASES = {
         'NAME': 'productUploader',
         'USER': 'root',
         'PASSWORD': 'Im@liem123#',
+        #'PASSWORD': 'KaV*sjs6IiE7', Production Pass
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }

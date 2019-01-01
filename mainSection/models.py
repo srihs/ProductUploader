@@ -3,6 +3,9 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
+from decimal import *
+import math
+
 
 class User(AbstractUser):
     is_buyer = models.BooleanField(default=False)
@@ -22,28 +25,29 @@ class Shipment(models.Model):
 
     def __str__(self):
         return self.shipmentNumber
-    
-    
 
- 
+
 class ProductTypes(models.Model):
-   id = models.AutoField(primary_key=True)
-   productType=models.CharField(max_length=100)
+    id = models.AutoField(primary_key=True)
+    productType = models.CharField(max_length=100)
 
-   class Meta:
+    class Meta:
         verbose_name_plural = "ProductTypes"
-   
-   def __str__(self):
-        return self.productType   
+
+    def __str__(self):
+        return self.productType
+
 
 class Products(models.Model):
     id = models.AutoField(primary_key=True)
-    sku= models.CharField(max_length=100)
-    vendor= models.CharField(max_length=500, blank=True)
+    sku = models.CharField(max_length=100)
+    vendor = models.CharField(max_length=500, blank=True)
     weight = models.PositiveIntegerField()
-    sellingPrice  = models.DecimalField(decimal_places=2,max_digits=10,null=True, blank=True)
-    productImg = models.ImageField(upload_to=settings.MEDIA_ROOT+'/%Y/%m/%d/', null=True, blank=True, max_length=5000)
-    types= models.ForeignKey(ProductTypes, on_delete=models.CASCADE)
+    sellingPrice = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
+    productImg = models.ImageField(
+        upload_to=settings.MEDIA_ROOT + '/%Y/%m/%d/', null=True, blank=True, max_length=5000)
+    types = models.ForeignKey(ProductTypes, on_delete=models.CASCADE)
     archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)
@@ -53,19 +57,26 @@ class Products(models.Model):
 
     def __str__(self):
         return self.sku
-    
 
-   
+
 class ShipmentDetail(models.Model):
     id = models.AutoField(primary_key=True)
-    shipment = models.ForeignKey(Shipment,on_delete=models.CASCADE)
-    product = models.ForeignKey(Products,on_delete=models.CASCADE)
-    indPrice = models.DecimalField(decimal_places=2,max_digits=10,null=True, blank=True)
-    qty  = models.PositiveIntegerField(null=True, blank=True)
-    totalAmount  = models.PositiveIntegerField(null=True, blank=True)
-    cost= models.DecimalField(decimal_places=2,max_digits=10,null=True, blank=True)
+    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    indPrice = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
+    qty = models.PositiveIntegerField(null=True, blank=True)
+    weight = models.PositiveIntegerField()
+    totalAmount = models.PositiveIntegerField(null=True, blank=True)
+    cost = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
+    sellingPrice50 = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
+    sellingPrice75 = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
     billDate = models.DateField(default=timezone.now)
     billNumber = models.PositiveIntegerField(null=True, blank=True)
+    is_checked =models.BooleanField(default='False')
     archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)
@@ -76,8 +87,19 @@ class ShipmentDetail(models.Model):
     @property
     def totalAmount(self):
         return self.indPrice * self.qty
-    
-        
 
+    @property
+    def cost(self):
+        #CONVERTED TO DECIMAL TO AVOID unsupported operand type(s) for *: 'decimal.Decimal' and 'float'
+        cost = Decimal(self.indPrice + 10) * Decimal(2.35 + self.weight)
+        return cost
     
-   
+    @property
+    def sellingPrice50(self):
+        # Roundin upo to highest 10
+        return int(math.ceil((Decimal(Decimal(self.cost) +  Decimal(self.cost * Decimal(0.5)))/10)))*10
+
+    @property
+    def sellingPrice75(self):
+        # Roundin upo to highest 10
+        return int(math.ceil((Decimal(Decimal(self.cost) +  Decimal(self.cost * Decimal(0.75)))/10)))*10

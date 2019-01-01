@@ -10,7 +10,7 @@
 
 <section class="content-header">
     <h1>
-        Fill
+        Review
         <small>Shipment</small>
     </h1>
     <ol class="breadcrumb">
@@ -32,21 +32,22 @@
                     <div class="row">
                         <div style="margin-left:auto; margin-right:0;">
                             <button id="btnFinalize" class="btn btn-danger" type="submit" name="shipmentid" data-toggle="modal"
-                                data-target="#confirmModal">Finalize Shipment</button>
+                                data-target="#confirmModal">Close Shipment</button>
                         </div>
                     </div>
-                    
+
                     {% if messages %}
                     <div class="row">
                         <div style="margin-left:auto; margin-right:auto;">
                             {% for message in messages %}
                             <div class="alert alert-danger alert-dismissible">
                                 <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                                <strong>Error! </strong> <p>{{ message }}</p>
+                                <strong>Error! </strong>
+                                <p>{{ message }}</p>
                             </div>
                         </div>
                         {% endfor %}
-                        
+
                     </div>
                     {% endif %}
 
@@ -55,7 +56,8 @@
                         Details </h5>
                     <div style="margin-right: auto; margin-left: auto;">
 
-                        <form id="frmfillShipment" action="{% url 'mainSection:fillshipment' %}" method="GET">
+                        <form id="frmfillShipment" action="{% url 'mainSection:reviewshipment' %}" method="POST">
+                            {% csrf_token %}
                             <div class="col-md-12 center">
                                 <div class="row">
                                     <div class="col-md-2 mb-4">
@@ -97,76 +99,36 @@
 
                         </form>
                     </div>
-                    <form id='frmCreateShipmentDetails' action="{% url 'mainSection:saveproduct' %}" method="POST"
-                        enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <!-- header Section-->
-                        <hr class="mb-4">
-                        <!-- End of the header Section-->
-
-                        <div class="col-md-12 center">
-                            <h5 class="mb-3" id="exampleModalLabel">Product Details</h5>
-
-                            <div class="row">
-                                <div class="col-md-2 mb-4">
-                                    {{productForm.sku}}
-                                </div>
-
-                                <div class="col-md-2 mb-4">
-                                    {{productForm.weight}}
-
-                                </div>
-
-                                <div class="col-md-2 mb-4">
-
-                                    <select name="productType" placeholder="Ind Price" class="form-control">
-                                        <option>-Select-</option>
-                                        {% for productType in productTypes %}
-                                        <option value='{{ productType.id}}'>{{ productType.productType}}</option>
-                                        {% endfor %}
-                                    </select>
-
-                                </div>
-                                <div class="col-md-3 mb-4">
-                                    {{productForm.vendor}}
-                                </div>
-                                <div class="col-md-3 mb-4">
-                                    {{productForm.img}}
-                                </div>
+                    <div class="col-md-12 center" style="margin-left:auto; margin-right:auto; margin-top: 1em">
+                        <h5 style="text-align: center; font-weight: bold; margin-top: 1em">Shipment
+                            Details </h5>
+                        <div class="row" style="margin-left:auto; margin-right:auto; margin-top: 2em">
+                            <div class="col-md-3 mb-4">
+                                <p> <strong> Shipment No -
+                                        {{selectedShipment.shipmentNumber}}</strong> </p>
                             </div>
+
+                            <div class="col-md-3 mb-4">
+                                <strong> Shipment Date -
+                                    {{selectedShipment.shipmentDate}} </strong>
+                            </div>
+
+
+                            <div class="col-md-3 mb-4">
+                                <strong> Shipment Total -
+                                    {{shipmentTotal|intcomma}}</strong>
+
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <strong> Shipment Qty - {{shipmentTotalQty|intcomma}} </strong>
+                            </div>
+
+
 
                         </div>
 
-                        <div class="col-md-12 center">
-                            <h5 class="mb-3" id="exampleModalLabel">Shipping Details</h5>
 
-                            <div class="row">
-
-                                <div class="col-md-2 mb-4">
-                                    {{ShipmentForm.indPrice}}
-
-                                </div>
-
-                                <div class="col-md-2 mb-4">
-                                    {{ShipmentForm.qty}}
-                                </div>
-
-                                <div class="col-md-2 mb-4">
-                                    {{ShipmentForm.billNumber}}
-                                </div>
-
-                                <div class="col-md-2 mb-4">
-                                    {{ShipmentForm.billDate}}
-                                </div>
-                                <div class="col-md-4 mb-4">
-                                    <button type="submit" id="btnAddItem" class="btn btn-primary" style="font-size: 14px;">
-                                        Add Product</button>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </form>
+                    </div>
 
 
                     <div class="row">
@@ -179,16 +141,24 @@
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;"></th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">SKU</th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">Type</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Weight (gms)</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Weight
+                                                (gms)</th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">Price</th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">QTY</th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">Total
                                                 Amount</th>
-                                            
+
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">Vendor</th>
                                             <th style="text-align: right; max-width:100%; word-wrap:break-word;">Image</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill Number</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill Date</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
+                                                Number</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
+                                                Date</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Cost</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Selling
+                                                price 50%</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Selling
+                                                price 75%</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -196,18 +166,30 @@
                                         {% for shipmentdetail in shipmentDetails %}
                                         <tr>
 
-                                            <td> <a href="{% url 'mainSection:deleteshipmentdetail' shipmentdetail.id %}"
-                                                    class="text-danger" onclick="return confirm('You are about to delete. Are you sure?')">
-                                                    <i class="fa fa-times-circle"></i>
+                                            {% if shipmentdetail.is_checked%}
+                                            <td> <a 
+                                                    class="text-primary">
+                                                    <i class="fas fa-user-check"></i>
 
                                                 </a></td>
+                                            {% else %}
+                                            <td> <a href="#reviewModal' shipmentdetail.id %}" data-toggle="modal"
+                                                data-target="#reviewModal"
+                                                    class="text-danger">
+                                                    <i class="fa fa-check-circle"></i>
+
+                                                </a></td>
+
+                                            {% endif %}
+
+
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.sku}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.types}}</td>
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.weight}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.weight}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.indPrice|intcomma}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.qty|intcomma}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.totalAmount|intcomma}}</td>
-                                            
+
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.vendor}}</td>
 
                                             {% if shipmentdetail.product.productImg %}
@@ -220,6 +202,9 @@
                                             {% endif %}
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.billNumber}}</td>
                                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.billDate}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.cost|floatformat:"0"|intcomma}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.sellingPrice50|floatformat:"0"|intcomma}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.sellingPrice75|floatformat:"0"|intcomma}}</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -230,18 +215,9 @@
                             </div>
                         </div>
                     </div>
-
-
-
-
                     <!-- /.box-body -->
                     <!-- end of the Grid section -->
-
-
                 </div>
-
-
-
             </div>
         </div>
     </div>
@@ -261,17 +237,42 @@
                 </div>
 
                 <div class="modal-body">
-                    <p>You are about to finalize the shipment No - {{selectedShipment.shipmentNumber}}.</p>
-                    <p>Once Finalized you cannot modify the shipment. Are you sure?</p>
+                    <p>You are about to close the shipment No - {{selectedShipment.shipmentNumber}}.</p>
+                    <p>Once closed you cannot modify the shipment. Are you sure?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-danger">Finalize</button>
+                    <button type="submit" class="btn btn-danger">Close Shipment</button>
                 </div>
             </div>
         </div>
     </div>
 </form>
+
+<form action="" method="POST">
+        {% csrf_token %}
+        <div class="modal" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reviewModalLabel">Product Review</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+    
+                    <div class="modal-body">
+                        <p>{{shipmentdetail.product.sku}}</p>
+                        <p>{{shipmentdetail.product.types}}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Verify</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 {% endblock content %}
 
 
@@ -282,20 +283,21 @@
 
 
 <script>
-
-    $(document).ready(function () {
-        // This funtion will determine if a shipment is loaded. if not, This function will disable the add product button.
-        if ($("#lblShipmentNumber").text().trim().length > 2) {
-            document.getElementById("btnAddItem").disabled = false;
-            document.getElementById("divStatus").style.visibility = 'visible';
-            document.getElementById("btnFinalize").disabled = false;
-
-        } else {
-            document.getElementById("btnAddItem").disabled = true;
-            document.getElementById("btnFinalize").disabled = true;
-
-        }
-    });
+        $(document).ready(function () {
+            // This funtion will determine if a shipment is loaded. if not, This function will disable the add product button.
+            if ($("#lblShipmentNumber").text().trim().length <1) {
+                $('#btnFinalize').prop('disabled', true);
+            } 
+            else
+            {
+                //document.getElementById("btnFinalize").disabled = true;
+                $('#btnFinalize').prop('disabled', false);
+    
+            }
+        });
+    </script>
+    
+<script>
 
     // This funtion is related to Datagrid Table
     $(function () {
@@ -312,16 +314,6 @@
 
 
 
-</script>
-
-<script>
-
-    $(function () {
-        //Initialize Select2 Elements
-        $('.select2').select2()
-        $('#datepicker2').datepicker({ autoclose: true, });
-
-    })
 </script>
 
 <script>

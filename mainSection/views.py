@@ -8,6 +8,8 @@ import json as simplejson
 from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails
 from django.contrib.auth.models import AbstractUser
 from django.http import QueryDict
+from .decorators import office_required, store_required
+
 
 from django.contrib.auth import (
     authenticate,
@@ -64,7 +66,11 @@ def saveshipment(request):
 @login_required
 def viewshipment(request):
     # Retrieving The shipments which are open to fill.
-    shipment_list = Shipment.objects.filter(buyer=request.user)
+    if request.user.is_officeUser or request.user.is_storeUser:
+        shipment_list = Shipment.objects.all()
+    else:
+        shipment_list = Shipment.objects.filter(buyer=request.user)
+
     shipmentItem_list = None
 
     if request.method == 'GET':
@@ -92,6 +98,46 @@ def viewshipment(request):
             messages.error(request, "Something went wrong.")
 
         return render(request, '../templates/mainSection/viewshipment.html', {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment':selectedShipment})
+
+
+@login_required
+@office_required
+def reviewShipment(request):
+
+    shipment_list =  Shipment.objects.filter(isClosed='False',isFinalized='1')
+    shipmentItem_list = None
+    shipmentTotal =None
+    shipmentTotalQty = None
+    selectedShipment =None
+
+    if request.method == 'GET':
+        return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
+
+    if request.method == 'POST':
+        # if the request if for a shipment that is selected in the dropdown the the following code block will execute
+        if request.POST['shipmentDropDown']:
+
+            # getting the shipmentID
+            shipmentID = request.POST['shipmentDropDown']
+
+            # Saving the selected Shipment object to passback to the template
+            selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
+
+            # getting the shipment List
+            shipmentItem_list = getShipmentItemsList(shipmentID)
+            shipmentTotal = 0
+            shipmentTotalQty = 0
+            for shipment in shipmentItem_list:
+                shipmentTotal += shipment.totalAmount
+                shipmentTotalQty += shipment.qty
+
+        else:
+            messages.error(request, "Something went wrong.")
+
+    
+    return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment':selectedShipment})
+
+
 
 
 # This method will handle the fillshipment request
@@ -180,6 +226,7 @@ def saveproduct(request):
             # creating the shipment detail Object
             shipmentDetailObj = shipmentDetialForm.save(commit=False)
             shipmentDetailObj.product = productObj
+            shipmentDetailObj.weight = productObj.weight
             shipmentDetailObj.shipment = Shipment.objects.get(id=shipmentID)
             shipmentDetailObj.save()
 

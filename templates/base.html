@@ -110,7 +110,7 @@
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu" data-widget="tree">
           <li class="header">MAIN NAVIGATION</li>
-          <li class="active treeview">
+          <li class="treeview">
             <a href="#">
               <i class="fa fa-plane"></i> <span>Shipments</span>
               <span class="pull-right-container">
@@ -125,6 +125,9 @@
               <li><a href="{% url 'mainSection:viewshipment' %}"><i class="fa fa-search"></i> View Shipments</a></li>
             </ul>
           </li>
+
+          
+          {% if user.is_officeUser or user.is_storeUser %}
           <li class="treeview">
             <a href="#">
               <i class="fa fa-institution"></i>
@@ -134,7 +137,7 @@
               </span>
             </a>
             <ul class="treeview-menu">
-              <li><a href="pages/layout/top-nav.html"><i class="fa fa-barcode"></i> Review Shipment</a></li>
+              <li><a href="{% url 'mainSection:reviewshipment' %}"><i class="fa fa-barcode"></i> Review Shipment</a></li>
               <li><a href="pages/layout/boxed.html"><i class="fa fa-search"></i> View Item</a></li>
 
             </ul>
@@ -151,6 +154,36 @@
               <li><a href="pages/layout/top-nav.html"><i class="fa fa-check-square-o"></i> Confirm Shipment</a></li>
             </ul>
           </li>
+          {% else %}
+           <!-- Disable Links for the buyers -->
+          <li class="treeview">
+            <a href="">
+              <i class="fa fa-institution"></i>
+              <span>Office</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a><i class="fa fa-barcode"></i> Review Shipment</a></li>
+              <li><a><i class="fa fa-search"></i> View Item</a></li>
+
+            </ul>
+          </li>
+          <li class="treeview">
+            <a href="">
+              <i class="fa fa-cubes"></i>
+              <span>Stores</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a><i class="fa fa-check-square-o"></i> Confirm Shipment</a></li>
+            </ul>
+          </li>
+          {% endif %}
+          
 
         </ul>
       </section>
