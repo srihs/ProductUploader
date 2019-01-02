@@ -19,12 +19,50 @@ class Shipment(models.Model):
     shipmentDate = models.DateField()
     isClosed = models.BooleanField(default='False')
     isFinalized = models.BooleanField(default='False')
+    costBase = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
     buyer = models.ForeignKey(User, on_delete=models.CASCADE)
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)
 
+
     def __str__(self):
         return self.shipmentNumber
+
+class CostType(models.Model):
+    id = models.AutoField(primary_key=True)
+    costType = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name_plural = "CostTypes"
+
+    def __str__(self):
+        return self.costType
+
+class ShipmentCostFactor(models.Model):
+     id = models.AutoField(primary_key=True)
+     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
+     costItem = models.CharField(max_length=500)
+     costItemPrice = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
+     exchangeRate = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
+     costItemPriceInLKR = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
+     costType = models.ForeignKey(CostType, on_delete=models.CASCADE)
+     dateCreated = models.DateTimeField(default=timezone.now)
+     dateModified = models.DateTimeField(default=timezone.now)
+
+     def __str__(self):
+        return self.id
+     class Meta:
+        verbose_name_plural = "CostFactors"
+        
+     @property
+     def costItemPriceInLKR(self):
+        return self.costItemPrice * self.exchangeRate
+
+
 
 
 class ProductTypes(models.Model):
@@ -91,7 +129,7 @@ class ShipmentDetail(models.Model):
     @property
     def cost(self):
         #CONVERTED TO DECIMAL TO AVOID unsupported operand type(s) for *: 'decimal.Decimal' and 'float'
-        cost = Decimal(self.indPrice + 10) * Decimal(2.35 + self.weight)
+        cost = Decimal(self.cost) * Decimal(indPrice)
         return cost
     
     @property

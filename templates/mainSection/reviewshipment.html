@@ -173,7 +173,7 @@
 
                                                 </a></td>
                                             {% else %}
-                                            <td> <a href="#reviewModal' shipmentdetail.id %}" data-toggle="modal"
+                                            <td> <a href="#reviewModal" data-toggle="modal"
                                                 data-target="#reviewModal"
                                                     class="text-danger">
                                                     <i class="fa fa-check-circle"></i>
@@ -249,8 +249,7 @@
     </div>
 </form>
 
-<form action="" method="POST">
-        {% csrf_token %}
+
         <div class="modal" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -262,7 +261,7 @@
                     </div>
     
                     <div class="modal-body">
-                        <p>{{shipmentdetail.product.sku}}</p>
+                        <p>{{shipmentdetail.id}}</p>
                         <p>{{shipmentdetail.product.types}}</p>
                     </div>
                     <div class="modal-footer">
@@ -272,7 +271,7 @@
                 </div>
             </div>
         </div>
-    </form>
+ 
 {% endblock content %}
 
 
@@ -280,7 +279,10 @@
 <script src="{% static '/js/select2.full.min.js' %}"></script>
 <script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
 
-
+<script>
+        var elem = document.querySelector('.modal')
+        var instance = M.Modal.init(elem)
+</script>
 
 <script>
         $(document).ready(function () {

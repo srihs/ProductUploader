@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="{% static 'css/bootstrap-grid.min.css' %}">
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="{% static 'css/font-awesome.min.css'%}">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
   <!-- Ionicons -->
   <link rel="stylesheet" href="{% static 'css/ionicons.min.css' %}">
   <!-- Theme style -->
@@ -112,15 +112,15 @@
           <li class="header">MAIN NAVIGATION</li>
           <li class="treeview">
             <a href="#">
-              <i class="fa fa-plane"></i> <span>Shipments</span>
+                <i class="fas fa-plane-departure"></i> <span>Shipments</span>
               <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
             </a>
             <ul class="treeview-menu">
-              <li class="active"><a href="{% url 'mainSection:createshipment' %}"><i class="fa fa-plus-circle"></i>
+              <li><a href="{% url 'mainSection:createshipment' %}"><i class="fas fa-plus-circle"></i>
                   Create Shipment</a></li>
-              <li class="active"><a id="fillShipmentLink" href="{% url 'mainSection:fillshipment' %}"><i class="fa fa-ship"></i>
+              <li><a id="fillShipmentLink" href="{% url 'mainSection:fillshipment' %}"><i class="fa fa-ship"></i>
                   Fill Shipment</a></li>
               <li><a href="{% url 'mainSection:viewshipment' %}"><i class="fa fa-search"></i> View Shipments</a></li>
             </ul>
@@ -130,13 +130,14 @@
           {% if user.is_officeUser or user.is_storeUser %}
           <li class="treeview">
             <a href="#">
-              <i class="fa fa-institution"></i>
+              <i class="fas fa-university"></i>
               <span>Office</span>
               <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
             </a>
             <ul class="treeview-menu">
+              <li><a href="{% url 'mainSection:costfactor' %}"><i class="fas fa-hand-holding-usd"></i> Shipment Cost Factor</a></li>
               <li><a href="{% url 'mainSection:reviewshipment' %}"><i class="fa fa-barcode"></i> Review Shipment</a></li>
               <li><a href="pages/layout/boxed.html"><i class="fa fa-search"></i> View Item</a></li>
 
@@ -165,6 +166,7 @@
               </span>
             </a>
             <ul class="treeview-menu">
+                <li><a><i class="fa fa-barcode"></i> Shipment Cost Factor</a></li>
               <li><a><i class="fa fa-barcode"></i> Review Shipment</a></li>
               <li><a><i class="fa fa-search"></i> View Item</a></li>
 

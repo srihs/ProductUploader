@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+
+
+<section class="content-header">
+    <h1>
+        Cost
+        <small>Shipment</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Shipment</a></li>
+        <li class="active">Fill Shipment</li>
+    </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="box box-default">
+
+        <div class="container">
+
+
+            <div class="row">
+                <div class="box-body">
+                    <div class="row">
+                        <div style="margin-left:auto; margin-right:0;">
+                            <button id="btnFinalize" class="btn btn-danger" type="submit" name="shipmentid" data-toggle="modal"
+                                data-target="#confirmModal">Finalize Cost</button>
+                        </div>
+                    </div>
+
+                    {% if messages %}
+                    <div class="row">
+                        <div style="margin-left:auto; margin-right:auto;">
+                            {% for message in messages %}
+                            <div class="alert alert-danger alert-dismissible">
+                                <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <strong>Error! </strong>
+                                <p>{{ message }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                    {% endif %}
+
+
+
+                    <div style="margin-right: auto; margin-left: auto;">
+
+                        <form id="frmfillShipment" action="{% url 'mainSection:costfactor' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="col-md-12 center">
+                                <div class="row">
+                                    <div class="col-md-3 mb-4">
+                                        <select name="shipmentDropDown" id="shipmentDropDown" class="form-control"
+                                            required>
+                                            <option value="">-Select Shipment-</option>
+                                            {% for shipment in shipments %}
+                                            {% if shipment.isClosed %}
+                                            {% endif %}
+                                            <option value="{{shipment.id}}">{{ shipment.shipmentNumber}}
+                                            </option>
+                                            {% endfor %}
+
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-2 mb-4">
+                                        <input id="btnLoad" class="btn btn-primary" style="font-size: 14px;" type="submit"
+                                            name="shipmentid" value="Load" />
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <form id='frmCreateShipmentDetails' action="{% url 'mainSection:saveproduct' %}" method="POST"
+                        enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <!-- header Section-->
+                        <hr class="mb-4">
+                        <!-- End of the header Section-->
+
+                        <div class="col-md-12 center" style="margin-left:auto; margin-right:auto; margin-top: 1em">
+                            <h5 style="text-align: center; font-weight: bold; margin-top: 1em">Shipment
+                                Details </h5>
+                            <div class="row" style="margin-left:auto; margin-right:auto; margin-top: 2em">
+                                <div class="col-md-3 mb-4">
+                                    <p> <strong> Shipment No -
+                                            {{selectedShipment.shipmentNumber}}</strong> </p>
+                                </div>
+
+                                <div class="col-md-3 mb-4">
+                                    <strong> Shipment Date -
+                                        {{selectedShipment.shipmentDate}} </strong>
+                                </div>
+
+
+                                <div class="col-md-3 mb-4">
+                                    <strong> Shipment Total -
+                                        {{shipmentTotal|intcomma}}</strong>
+
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <strong> Shipment Qty - {{shipmentTotalQty|intcomma}} </strong>
+                                </div>
+
+
+
+                            </div>
+
+
+                        </div>
+
+                    </form>
+                    <div class="col-md-12 center" style=" margin-top: 1em">
+                        <h5 class="mb-3" id="exampleModalLabel">Cost Details</h5>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-4">
+                                Cost Item {{form.costItem}}
+                            </div>
+
+                            <div class="col-md-3 mb-4">
+                                Cost Item Price{{form.costItemPrice}}
+                            </div>
+                            <div class="col-md-3 mb-4">Cost Type
+                                <select name="costTypeDropDown" id="costTypeDropDown" class="form-control" required>
+                                    <option value="">-Select Cost Type-</option>
+                                    {% for costType in costTypes %}
+                                    <option value="{{costType.id}}">{{ costType.costType}}
+                                    </option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+
+
+                        </div>
+                        <div class="row">
+                            <div style="margin-left:auto; margin-right:0;">
+
+                                <div class="col-md-3 mb-4">
+                                    <button type="submit" id="btnAddItem" class="btn btn-primary" style="font-size: 14px;">
+                                        Add Cost Item</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+
+                    <div class="row">
+                        <div class="box">
+                            <div class="box-body" style="width:100%">
+                                <table id="tblProduct" class="hover" style="width:100%">
+                                    <thead>
+                                        <tr>
+
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;"></th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Cost
+                                                Item</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Cost
+                                                Item Price</th>
+                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Cost
+                                                Item Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        {% for shipmentdetail in shipmentDetails %}
+                                        <tr>
+
+                                            <td> <a href="{% url 'mainSection:deleteshipmentdetail' shipmentdetail.id %}"
+                                                    class="text-danger" onclick="return confirm('You are about to delete. Are you sure?')">
+                                                    <i class="fa fa-times-circle"></i>
+
+                                                </a></td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.sku}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.types}}</td>
+                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.weight}}</td>
+                                           
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <!-- /.box-body -->
+                    <!-- end of the Grid section -->
+
+
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
+<!-- Modal -->
+<form action="{% url 'mainSection:finalizeshipment' %}" method="POST">
+    {% csrf_token %}
+    <div class="modal" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Shipment Finalization</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>You are about to finalize the shipment No - {{selectedShipment.shipmentNumber}}.</p>
+                    <p>Once Finalized you cannot modify the shipment. Are you sure?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Finalize</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock content %}
+
+
+{% block scripts %}
+<script src="{% static '/js/select2.full.min.js' %}"></script>
+<script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
+
+
+
+<script>
+
+    $(document).ready(function () {
+        // This funtion will determine if a shipment is loaded. if not, This function will disable the add product button.
+        if ($("#lblShipmentNumber").text().trim().length > 2) {
+            document.getElementById("btnAddItem").disabled = false;
+            document.getElementById("divStatus").style.visibility = 'visible';
+            document.getElementById("btnFinalize").disabled = false;
+
+        } else {
+            document.getElementById("btnAddItem").disabled = true;
+            document.getElementById("btnFinalize").disabled = true;
+
+        }
+    });
+
+    // This funtion is related to Datagrid Table
+    $(function () {
+
+        $('#tblProduct').DataTable({
+            'paging': true,
+            'searching': false,
+            'ordering': true,
+            'info': true,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            'autoWidth': true
+        })
+    });
+
+
+
+</script>
+
+<script>
+
+    $(function () {
+        //Initialize Select2 Elements
+        $('.select2').select2()
+        $('#datepicker2').datepicker({ autoclose: true, });
+
+    })
+</script>
+
+<script>
+    $('#frmfillShipment').submit(function () {
+        document.getElementById("loading").style.display = "visible";
+    });
+</script>
+
+{% endblock scripts %}

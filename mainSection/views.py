@@ -2,10 +2,10 @@ from django.shortcuts import render, redirect, reverse, HttpResponse, get_object
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.datastructures import MultiValueDictKeyError
-from .models import Shipment, ProductTypes, ShipmentDetail, Products
+from .models import Shipment, ProductTypes, ShipmentDetail, Products,CostType
 from django.utils import timezone
 import json as simplejson
-from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails
+from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm
 from django.contrib.auth.models import AbstractUser
 from django.http import QueryDict
 from .decorators import office_required, store_required
@@ -16,6 +16,42 @@ from django.contrib.auth import (
     login,
     logout,
 )
+
+#global variables
+shipment_list = None
+shipmentItem_list = None
+shipmentTotal = None
+shipmentTotalQty = None
+selectedShipment = None
+########
+
+#global Methods
+# This function will accept a shipmentID and return a shipmentItemList
+
+
+def getShipmentItemsList(shipmentId):
+    if shipmentId is None:
+        shipmentItem_list = None
+    else:
+        shipmentItem_list = ShipmentDetail.objects.filter(
+            shipment=shipmentId, archived='0').select_related('shipment').select_related('product').select_related('product__types')
+
+    return shipmentItem_list
+
+# This function will accept a shipmentID and return a shipment Details
+
+
+def getShipmentDetails(shipmentId):
+        # getting the shipment List
+    shipmentItem_list = getShipmentItemsList(shipmentId)
+    shipmentTotal = 0
+    shipmentTotalQty = 0
+
+    for shipment in shipmentItem_list:
+        shipmentTotal += shipment.totalAmount
+        shipmentTotalQty += shipment.qty
+
+    print(shipmentTotal)
 
 
 @login_required
@@ -28,7 +64,7 @@ def home(request):
 @login_required
 def createshipment(request):
     if request.method == "GET":
-        
+
         # clearing the session form the system. so the New id will be facilitated
         request.session['shipmentID'] = None
         request.session.modified = True
@@ -55,7 +91,7 @@ def saveshipment(request):
         form = CreateShipmentForm(request.POST)
         if form.is_valid():
             objShipment = form.save(commit=False)
-            
+
             objShipment.buyer = request.user
             objShipment.save()
         else:
@@ -97,18 +133,18 @@ def viewshipment(request):
         else:
             messages.error(request, "Something went wrong.")
 
-        return render(request, '../templates/mainSection/viewshipment.html', {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment':selectedShipment})
+        return render(request, '../templates/mainSection/viewshipment.html', {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
 
 
 @login_required
 @office_required
 def reviewShipment(request):
 
-    shipment_list =  Shipment.objects.filter(isClosed='False',isFinalized='1')
-    shipmentItem_list = None
-    shipmentTotal =None
-    shipmentTotalQty = None
-    selectedShipment =None
+    shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='1')
+    # shipmentItem_list = None
+    # shipmentTotal =None
+    # shipmentTotalQty = None
+    # selectedShipment =None
 
     if request.method == 'GET':
         return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
@@ -119,25 +155,15 @@ def reviewShipment(request):
 
             # getting the shipmentID
             shipmentID = request.POST['shipmentDropDown']
-
             # Saving the selected Shipment object to passback to the template
             selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
 
-            # getting the shipment List
-            shipmentItem_list = getShipmentItemsList(shipmentID)
-            shipmentTotal = 0
-            shipmentTotalQty = 0
-            for shipment in shipmentItem_list:
-                shipmentTotal += shipment.totalAmount
-                shipmentTotalQty += shipment.qty
+            getShipmentDetails(shipmentID)
 
         else:
             messages.error(request, "Something went wrong.")
 
-    
-    return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment':selectedShipment})
-
-
+    return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
 
 
 # This method will handle the fillshipment request
@@ -183,18 +209,6 @@ def fillshipment(request):
         selectedShipment = None
 
     return render(request, '../templates/mainSection/fillshipment.html', {'selectedShipment': selectedShipment, 'productTypes': productType_list, 'shipments': shipment_list, 'productForm': productForm, 'shipmentDetails': shipmentItem_list, 'ShipmentForm': shipmentDetailForm})
-
-
-# This function will accept a shipmentID and return a shipmentItemList
-def getShipmentItemsList(shipmentId):
-
-    if shipmentId is None:
-        shipmentItem_list = None
-    else:
-        shipmentItem_list = ShipmentDetail.objects.filter(
-            shipment=shipmentId, archived='0').select_related('shipment').select_related('product').select_related('product__types')
-        
-    return shipmentItem_list
 
 
 # This method will handle the save product request
@@ -268,3 +282,41 @@ def finalizeshipment(request):
                 request, 'This Shipment has no products assigned. Please add products before finalize the shipment.')
 
     return redirect('mainSection:fillshipment')
+
+
+@login_required
+def generateCostFactor(request):
+    shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='1')
+    costTypes = CostType.objects.all()
+
+    form = CreateCostFactorForm()
+
+    if request.method == 'GET':
+        return render(request, '../templates/mainSection/costfactor.html', {'form': form, 'shipments': shipment_list, 'costTypes': costTypes})
+
+    if request.method == 'POST':
+        # if the request if for a shipment that is selected in the dropdown the the following code block will execute
+        if request.POST['shipmentDropDown']:
+
+            # getting the shipmentID
+            shipmentID = request.POST['shipmentDropDown']
+            # Saving the selected Shipment object to passback to the template
+            selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
+            shipmentItem_list = getShipmentItemsList(shipmentID)
+            shipmentTotal = 0
+            shipmentTotalQty = 0
+
+            for shipment in shipmentItem_list:
+             shipmentTotal += shipment.totalAmount
+             shipmentTotalQty += shipment.qty
+
+            return render(request, '../templates/mainSection/costfactor.html', {'form': form, 'shipments': shipment_list, 'costTypes': costTypes,'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
+
+        else:
+            messages.error(request, "Something went wrong.")
+        
+        return render(request, '../templates/mainSection/costfactor.html', {'form': form, 'shipments': shipment_list, 'costTypes': costTypes,'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
+        
+
+        
+

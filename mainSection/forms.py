@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ImageField
 from django.db import models
-from .models import Shipment, Products ,ShipmentDetail
+from .models import Shipment, Products ,ShipmentDetail , ShipmentCostFactor
 
 
 # CreateShipmentForm
@@ -75,4 +75,27 @@ class CreateShipmentDetails(forms.ModelForm):
         model = ShipmentDetail
         fields = ['indPrice', 'qty' , 'billDate','billNumber']
 
+class CreateCostFactorForm(forms.ModelForm):
+
+    costItem = forms.CharField(max_length=50, required=True, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'id': 'costItem',
+               'required': 'true'}
+    ))
+
+    costItemPrice = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.NumberInput(
+        attrs={'class': 'form-control', 'id': 'costItemPrice',
+               'required': 'true'}
+    ))
+
+    costType = forms.CharField(max_length=50, required=True, widget=forms.Select(
+        attrs={'class': 'form-control', 'id': 'costType',
+               'required': 'true'}
+    ))
+
+    class Meta:
+        model = ShipmentCostFactor
+        fields = ['costItem', 'costItemPrice' , 'costType']
+
+
+    
 
