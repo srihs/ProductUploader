@@ -1,31 +1,22 @@
-from django.shortcuts import render, redirect, reverse, HttpResponse, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.utils.datastructures import MultiValueDictKeyError
-from .models import Shipment, ProductTypes, ShipmentDetail, Products,CostType
-from django.utils import timezone
-import json as simplejson
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+
+from .decorators import office_required
 from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm
-from django.contrib.auth.models import AbstractUser
-from django.http import QueryDict
-from .decorators import office_required, store_required
+from .models import Shipment, ProductTypes, ShipmentDetail
 
-
-from django.contrib.auth import (
-    authenticate,
-    login,
-    logout,
-)
-
-#global variables
+# global variables
 shipment_list = None
 shipmentItem_list = None
 shipmentTotal = None
 shipmentTotalQty = None
 selectedShipment = None
+
+
 ########
 
-#global Methods
+# global Methods
 # This function will accept a shipmentID and return a shipmentItemList
 
 
@@ -34,15 +25,17 @@ def getShipmentItemsList(shipmentId):
         shipmentItem_list = None
     else:
         shipmentItem_list = ShipmentDetail.objects.filter(
-            shipment=shipmentId, archived='0').select_related('shipment').select_related('product').select_related('product__types')
+            shipment=shipmentId, archived='0').select_related('shipment').select_related('product').select_related(
+            'product__types')
 
     return shipmentItem_list
+
 
 # This function will accept a shipmentID and return a shipment Details
 
 
 def getShipmentDetails(shipmentId):
-        # getting the shipment List
+    # getting the shipment List
     shipmentItem_list = getShipmentItemsList(shipmentId)
     shipmentTotal = 0
     shipmentTotalQty = 0
@@ -60,7 +53,7 @@ def home(request):
     return render(request, '../templates/mainSection/home.html')
 
 
-# This method will handle the createshipment request
+# This method will handle the create shipment request
 @login_required
 def createshipment(request):
     if request.method == "GET":
@@ -71,7 +64,7 @@ def createshipment(request):
 
         # shipmentNumber is defined by 'SHN-000' + next Id in the shipment Table
         try:
-             # trying to retrive the next primaryKey
+            # trying to retrive the next primaryKey
             nextId = Shipment.objects.all().count()
             nextId += 1
         except:
@@ -133,13 +126,14 @@ def viewshipment(request):
         else:
             messages.error(request, "Something went wrong.")
 
-        return render(request, '../templates/mainSection/viewshipment.html', {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
+        return render(request, '../templates/mainSection/viewshipment.html',
+                      {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal,
+                       'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
 
 
 @login_required
 @office_required
 def reviewShipment(request):
-
     shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='1')
     # shipmentItem_list = None
     # shipmentTotal =None
@@ -163,7 +157,9 @@ def reviewShipment(request):
         else:
             messages.error(request, "Something went wrong.")
 
-    return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
+    return render(request, '../templates/mainSection/reviewshipment.html',
+                  {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal,
+                   'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
 
 
 # This method will handle the fillshipment request
@@ -198,17 +194,21 @@ def fillshipment(request):
         request.session['shipmentID'] = selectedShipment.id
 
     # This block will handel the requests with out shipping Id
-    elif request.method == 'GET' and request is not None and 'shipmentID' in request.session and request.session['shipmentID'] is not None:
+    elif request.method == 'GET' and request is not None and 'shipmentID' in request.session and request.session[
+        'shipmentID'] is not None:
         shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
-        # since the session.flush is voided due to the the authentication issue, ShipmentID is set to null in the sessio variable
-        # therefor need to check for null.
+        # since the session.flush is voided due to the the authentication issue, ShipmentID is set to null in the
+        # session variable therefor need to check for null.
         selectedShipment = Shipment.objects.get(
             id=request.session['shipmentID'])
     else:
         shipmentItem_list = None
         selectedShipment = None
 
-    return render(request, '../templates/mainSection/fillshipment.html', {'selectedShipment': selectedShipment, 'productTypes': productType_list, 'shipments': shipment_list, 'productForm': productForm, 'shipmentDetails': shipmentItem_list, 'ShipmentForm': shipmentDetailForm})
+    return render(request, '../templates/mainSection/fillshipment.html',
+                  {'selectedShipment': selectedShipment, 'productTypes': productType_list, 'shipments': shipment_list,
+                   'productForm': productForm, 'shipmentDetails': shipmentItem_list,
+                   'ShipmentForm': shipmentDetailForm})
 
 
 # This method will handle the save product request
@@ -286,37 +286,26 @@ def finalizeshipment(request):
 
 @login_required
 def generateCostFactor(request):
-    shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='1')
-    costTypes = CostType.objects.all()
-
+    shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='True', isCostbaseFinalized='False')
     form = CreateCostFactorForm()
-
     if request.method == 'GET':
-        return render(request, '../templates/mainSection/costfactor.html', {'form': form, 'shipments': shipment_list, 'costTypes': costTypes})
+        return render(request, '../templates/mainSection/costfactor.html', {'form': form, 'shipments': shipment_list})
 
     if request.method == 'POST':
-        # if the request if for a shipment that is selected in the dropdown the the following code block will execute
-        if request.POST['shipmentDropDown']:
+        form = CreateCostFactorForm(request.POST, request.FILES)
+        if form.is_valid():
+            shipmnetID = request.POST.get('shipmentDropDown')
+            objShipment = Shipment.objects.get(pk=shipmnetID)
 
-            # getting the shipmentID
-            shipmentID = request.POST['shipmentDropDown']
-            # Saving the selected Shipment object to passback to the template
-            selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
-            shipmentItem_list = getShipmentItemsList(shipmentID)
-            shipmentTotal = 0
-            shipmentTotalQty = 0
 
-            for shipment in shipmentItem_list:
-             shipmentTotal += shipment.totalAmount
-             shipmentTotalQty += shipment.qty
+            objShipment.isCostbaseFinalized = True
+            objShipment.costBase = form.cleaned_data['costBase']
 
-            return render(request, '../templates/mainSection/costfactor.html', {'form': form, 'shipments': shipment_list, 'costTypes': costTypes,'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
-
+            # assigning the product image
+            objShipment.costFile = form.cleaned_data['costFile']
+            print(form.cleaned_data['costFile'])
+            objShipment.save()
         else:
             messages.error(request, "Something went wrong.")
-        
-        return render(request, '../templates/mainSection/costfactor.html', {'form': form, 'shipments': shipment_list, 'costTypes': costTypes,'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal, 'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
-        
 
-        
-
+    return render(request, '../templates/mainSection/costfactor.html', {'form': form, 'shipments': shipment_list})

@@ -88,7 +88,8 @@
       <!-- Header Navbar: style can be found in header.less -->
       <nav class="navbar navbar-static-top">
         <!-- Sidebar toggle button-->
-        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <a href="#" class="btn btn-primary" data-toggle="push-menu" role="button">
+            <i class="fas fa-align-left"></i>
           <span class="sr-only">Toggle navigation</span>
         </a>
         <div class="col-6 text-right">
@@ -126,7 +127,7 @@
             </ul>
           </li>
 
-          
+
           {% if user.is_officeUser or user.is_storeUser %}
           <li class="treeview">
             <a href="#">
@@ -185,7 +186,7 @@
             </ul>
           </li>
           {% endif %}
-          
+
 
         </ul>
       </section>
@@ -252,7 +253,7 @@
     <script>
       window.onload = function () {
         document.getElementById("loading").style.display = "none";
-      }   
+      }
     </script>
     {% block scripts %}
 

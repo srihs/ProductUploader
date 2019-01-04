@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
 from decimal import *
 import math
@@ -19,51 +18,18 @@ class Shipment(models.Model):
     shipmentDate = models.DateField()
     isClosed = models.BooleanField(default='False')
     isFinalized = models.BooleanField(default='False')
+    isCostbaseFinalized = models.BooleanField(default='False')
     costBase = models.DecimalField(
         decimal_places=2, max_digits=10, null=True, blank=True)
+    costFile = models.FileField(
+        upload_to=settings.MEDIA_ROOT + '/Costing/%Y/%m/%d/', null=True, blank=True, max_length=5000)
     buyer = models.ForeignKey(User, on_delete=models.CASCADE)
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)
 
-
+    @property
     def __str__(self):
         return self.shipmentNumber
-
-class CostType(models.Model):
-    id = models.AutoField(primary_key=True)
-    costType = models.CharField(max_length=100)
-
-    class Meta:
-        verbose_name_plural = "CostTypes"
-
-    def __str__(self):
-        return self.costType
-
-class ShipmentCostFactor(models.Model):
-     id = models.AutoField(primary_key=True)
-     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
-     costItem = models.CharField(max_length=500)
-     costItemPrice = models.DecimalField(
-        decimal_places=2, max_digits=10, null=True, blank=True)
-     exchangeRate = models.DecimalField(
-        decimal_places=2, max_digits=10, null=True, blank=True)
-     costItemPriceInLKR = models.DecimalField(
-        decimal_places=2, max_digits=10, null=True, blank=True)
-     costType = models.ForeignKey(CostType, on_delete=models.CASCADE)
-     dateCreated = models.DateTimeField(default=timezone.now)
-     dateModified = models.DateTimeField(default=timezone.now)
-
-     def __str__(self):
-        return self.id
-     class Meta:
-        verbose_name_plural = "CostFactors"
-        
-     @property
-     def costItemPriceInLKR(self):
-        return self.costItemPrice * self.exchangeRate
-
-
-
 
 class ProductTypes(models.Model):
     id = models.AutoField(primary_key=True)
@@ -114,7 +80,7 @@ class ShipmentDetail(models.Model):
         decimal_places=2, max_digits=10, null=True, blank=True)
     billDate = models.DateField(default=timezone.now)
     billNumber = models.PositiveIntegerField(null=True, blank=True)
-    is_checked =models.BooleanField(default='False')
+    is_checked = models.BooleanField(default='False')
     archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)
@@ -128,7 +94,7 @@ class ShipmentDetail(models.Model):
 
     @property
     def cost(self):
-        #CONVERTED TO DECIMAL TO AVOID unsupported operand type(s) for *: 'decimal.Decimal' and 'float'
+        # CONVERTED TO DECIMAL TO AVOID unsupported operand type(s) for *: 'decimal.Decimal' and 'float'
         cost = Decimal(self.cost) * Decimal(indPrice)
         return cost
     
@@ -139,5 +105,5 @@ class ShipmentDetail(models.Model):
 
     @property
     def sellingPrice75(self):
-        # Roundin upo to highest 10
+        # Rounding upo to highest 10
         return int(math.ceil((Decimal(Decimal(self.cost) +  Decimal(self.cost * Decimal(0.75)))/10)))*10
