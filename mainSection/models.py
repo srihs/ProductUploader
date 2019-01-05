@@ -110,7 +110,7 @@ class ShipmentDetail(models.Model):
     @property
     def cost(self):
         # CONVERTED TO DECIMAL TO AVOID unsupported operand type(s) for *: 'decimal.Decimal' and 'float'
-        cost = Decimal(self.cost) * Decimal(indPrice)
+        cost = Decimal(self.costBase) * Decimal(indPrice)
         return cost
     
     @property
