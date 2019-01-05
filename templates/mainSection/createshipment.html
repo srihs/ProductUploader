@@ -33,6 +33,22 @@
                         <label id="shipmentNumber" style="margin-right: auto; margin-left: auto;">{{form.shipmentNumber}}
                         </label>
                     </div>
+                <h6 style="text-align: center; font-weight: bold;">Shipment
+                        point: </h6>
+                    <div class="im-centered row">
+                            <div class="col-md-3 mb-4" style="margin-right: auto; margin-left: auto;">
+                                <select name="shipmentPointDropDown" id="shipmentPointDropDown" class="form-control"
+                                        required>
+                                    <option value="">-Select Shipment Point-</option>
+                                    {% for shipmentPoint in shipmentPointList %}
+                                        <option value="{{ shipmentPoint.id }}">{{ shipmentPoint.shippingPoint }}
+                                        </option>
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+                        </div>
                     <h6 style="text-align: center; font-weight: bold;">Shipment Date:</h6>
                     <div class="im-centered row">
                         {{form.shipmentDate}}
@@ -83,19 +99,6 @@
     })
 </script>
 
-<script>
-    $(function () {
-
-        $('#tblProduct').DataTable({
-            'paging': true,
-            'lengthChange': false,
-            'searching': false,
-            'ordering': true,
-            'info': true,
-            'autoWidth': false
-        })
-    });
-</script>
 
 <script>
     $("frmCreateShipment").submit(function (e) {
