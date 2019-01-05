@@ -86,33 +86,40 @@
                             <div class="row" style="margin-left:auto; margin-right:auto; margin-top: 2em">
                                 <div class="col-md-3 mb-4">
                                     <strong> Shipment No - </strong>
-                                    <p class="text-danger"> <strong> {{ selectedShipment.shipmentNumber }} </strong></p>
+                                    <p class="text-danger"><strong> {{ selectedShipment.shipmentNumber }} </strong></p>
                                 </div>
 
                                 <div class="col-md-3 mb-4">
                                     <strong> Shipment Date -</strong>
-                                       <p class="text-danger"> <strong>  {{ selectedShipment.shipmentDate }} </strong></p>
+                                    <p class="text-danger"><strong>  {{ selectedShipment.shipmentDate }} </strong></p>
                                 </div>
 
 
                                 <div class="col-md-3 mb-4">
                                     <strong> Shipment Total -</strong>
-                                       <p class="text-danger"> <strong> {{ shipmentTotal|intcomma }}</strong></p>
+                                    <p class="text-danger"><strong> {{ shipmentTotal|intcomma }}</strong></p>
 
                                 </div>
                                 <div class="col-md-3 mb-4">
                                     <strong> Shipment Qty - </strong>
-                                        <p class="text-danger"> <strong> {{ shipmentTotalQty|intcomma }} </strong></p>
+                                    <p class="text-danger"><strong> {{ shipmentTotalQty|intcomma }} </strong></p>
                                 </div>
 
                                 <div class="col-md-3 mb-4">
                                     <strong> Shipping From - </strong>
-                                    <p class="text-danger"> <strong>  {{ selectedShipment.shippingPoint }}</strong></p>
+                                    <p class="text-danger"><strong>  {{ selectedShipment.shippingPoint }}</strong></p>
                                 </div>
 
                                 <div class="col-md-3 mb-4">
                                     <strong> Buyer - </strong>
-                                      <p class="text-danger"> <strong>  {{ selectedShipment.buyer.first_name }} {{ selectedShipment.buyer.last_name }} </strong></p>
+                                    <p class="text-danger">
+                                        <strong>  {{ selectedShipment.buyer.first_name }} {{ selectedShipment.buyer.last_name }} </strong>
+                                    </p>
+                                </div>
+
+                                <div class="col-md-3 mb-4">
+                                    <strong> Shipment Weight (Tot.) - </strong>
+                                    <p class="text-danger"><strong>  {{ shippingWeightKG }} Kgs </strong></p>
                                 </div>
 
 

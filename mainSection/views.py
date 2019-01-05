@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import  Count
 
 from .decorators import office_required
 from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm
@@ -44,7 +45,7 @@ def getShipmentDetails(shipmentId):
         shipmentTotal += shipment.totalAmount
         shipmentTotalQty += shipment.qty
 
-    print(shipmentTotal)
+
 
 
 @login_required
@@ -119,20 +120,25 @@ def viewshipment(request):
             selectedShipment = Shipment.objects.select_related('shippingPoint').select_related('buyer').get(id=shipmentID)
 
 
+
             # getting the shipment List
             shipmentItem_list = getShipmentItemsList(shipmentID)
             shipmentTotal = 0
             shipmentTotalQty = 0
+            shippingWeight = 0
             for shipment in shipmentItem_list:
                 shipmentTotal += shipment.totalAmount
                 shipmentTotalQty += shipment.qty
+                shippingWeight += shipment.weight * shipment.qty
+
+            shippingWeightKG = shippingWeight/1000
 
         else:
             messages.error(request, "Something went wrong.")
 
         return render(request, '../templates/mainSection/viewshipment.html',
                       {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal,
-                       'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment})
+                       'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment,'shippingWeightKG':shippingWeightKG})
 
 
 @login_required
