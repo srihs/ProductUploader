@@ -85,6 +85,8 @@ class ShipmentDetail(models.Model):
     qty = models.PositiveIntegerField(null=True, blank=True)
     weight = models.PositiveIntegerField()
     totalAmount = models.PositiveIntegerField(null=True, blank=True)
+    costBase = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
     cost = models.DecimalField(
         decimal_places=2, max_digits=10, null=True, blank=True)
     sellingPrice50 = models.DecimalField(

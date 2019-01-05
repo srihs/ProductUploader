@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import  Count
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
+from django.db import transaction
 
 from .decorators import office_required
 from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm
@@ -26,27 +26,9 @@ def getShipmentItemsList(shipmentId):
         shipmentItem_list = None
     else:
         shipmentItem_list = ShipmentDetail.objects.filter(
-            shipment=shipmentId, archived='0').select_related('shipment').select_related('product').select_related(
+            shipment=shipmentId, archived='0').select_related('product').select_related(
             'product__types')
-
     return shipmentItem_list
-
-
-# This function will accept a shipmentID and return a shipment Details
-
-
-def getShipmentDetails(shipmentId):
-    # getting the shipment List
-    shipmentItem_list = getShipmentItemsList(shipmentId)
-    shipmentTotal = 0
-    shipmentTotalQty = 0
-
-    for shipment in shipmentItem_list:
-        shipmentTotal += shipment.totalAmount
-        shipmentTotalQty += shipment.qty
-
-
-
 
 @login_required
 def home(request):
@@ -144,25 +126,31 @@ def viewshipment(request):
 @login_required
 @office_required
 def reviewShipment(request):
-    shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='1')
-    # shipmentItem_list = None
-    # shipmentTotal =None
-    # shipmentTotalQty = None
-    # selectedShipment =None
+    shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='1', isCostbaseFinalized='1')
+
 
     if request.method == 'GET':
         return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
 
     if request.method == 'POST':
         # if the request if for a shipment that is selected in the dropdown the the following code block will execute
-        if request.POST['shipmentDropDown']:
+        if request.POST.get('shipmentDropDown'):
 
             # getting the shipmentID
-            shipmentID = request.POST['shipmentDropDown']
+            shipmentID = request.POST.get('shipmentDropDown')
             # Saving the selected Shipment object to passback to the template
             selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
 
-            getShipmentDetails(shipmentID)
+            shipmentItem_list = getShipmentItemsList(shipmentID)
+            shipmentTotal = 0
+            shipmentTotalQty = 0
+
+            for shipment in shipmentItem_list:
+                shipmentTotal += shipment.totalAmount
+                shipmentTotalQty += shipment.qty
+
+            print(shipmentTotal)
+            print(shipmentTotalQty)
 
         else:
             messages.error(request, "Something went wrong.")
@@ -295,6 +283,7 @@ def finalizeshipment(request):
 
 
 @login_required
+@transaction.atomic
 def generateCostFactor(request):
     shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='True', isCostbaseFinalized='False')
     form = CreateCostFactorForm()
@@ -305,17 +294,23 @@ def generateCostFactor(request):
         form = CreateCostFactorForm(request.POST, request.FILES)
         if form.is_valid():
             shipmnetID = request.POST.get('shipmentDropDown')
-            objShipment = Shipment.objects.get(pk=shipmnetID)
-
-
+            objShipment = get_object_or_404(Shipment,pk=shipmnetID)
             objShipment.isCostbaseFinalized = True
             objShipment.costBase = form.cleaned_data['costBase']
-
-            # assigning the product image
+            # assigning the cost file
             objShipment.costFile = form.cleaned_data['costFile']
-            print(form.cleaned_data['costFile'])
+
+            shipmentItem_list = getShipmentItemsList(shipmnetID)
+
+            for shipmentItem in shipmentItem_list:
+                shipmentItem.costBase = objShipment.costBase
+                shipmentItem.save()
+
             objShipment.save()
+            form = CreateCostFactorForm() # Added this to clear the previous values for fields
+
         else:
             messages.error(request, "Something went wrong.")
 
-    return render(request, '../templates/mainSection/costfactor.html', {'form': form, 'shipments': shipment_list})
+    return render(request, '../templates/mainSection/costfactor.html',
+                  {'form': form, 'shipments': shipment_list})
