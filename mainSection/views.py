@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from .decorators import office_required
 from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm
-from .models import Shipment, ProductTypes, ShipmentDetail
+from .models import Shipment, ProductTypes, ShipmentDetail , Country
 
 # global variables
 shipment_list = None
@@ -70,11 +70,12 @@ def createshipment(request):
         except:
             # if the next ID is null define the record as the first
             nextId = 1
+        shipmentPointList = Country.objects.all();
         # creating the form with the shipment ID
         form = CreateShipmentForm(
             initial={'shipmentNumber': 'SHN-000' + str(nextId)})
 
-    return render(request, '../templates/mainSection/createshipment.html', {'form': form, 'user': request.user})
+    return render(request, '../templates/mainSection/createshipment.html', {'form': form, 'user': request.user, 'shipmentPointList': shipmentPointList})
 
 
 # This method will handle the Save shipment request
@@ -84,7 +85,9 @@ def saveshipment(request):
         form = CreateShipmentForm(request.POST)
         if form.is_valid():
             objShipment = form.save(commit=False)
+            objCountry = get_object_or_404(Country, pk=request.POST.get('shipmentPointDropDown'))
 
+            objShipment.shippingPoint = objCountry
             objShipment.buyer = request.user
             objShipment.save()
         else:

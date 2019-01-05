@@ -12,6 +12,17 @@ class User(AbstractUser):
     is_storeUser = models.BooleanField(default=False)
 
 
+class Country(models.Model):
+    id = models.AutoField(primary_key=True)
+    shippingPoint = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name_plural = "ShippingPoints"
+
+    def __str__(self):
+        return self.shippingPoint
+
+
 class Shipment(models.Model):
     id = models.AutoField(primary_key=True)
     shipmentNumber = models.CharField(max_length=50)
@@ -23,6 +34,7 @@ class Shipment(models.Model):
         decimal_places=2, max_digits=10, null=True, blank=True)
     costFile = models.FileField(
         upload_to=settings.MEDIA_ROOT + '/Costing/%Y/%m/%d/', null=True, blank=True, max_length=5000)
+    shippingPoint = models.ForeignKey(Country, on_delete=models.CASCADE)
     buyer = models.ForeignKey(User, on_delete=models.CASCADE)
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)
@@ -30,6 +42,7 @@ class Shipment(models.Model):
     @property
     def __str__(self):
         return self.shipmentNumber
+
 
 class ProductTypes(models.Model):
     id = models.AutoField(primary_key=True)
