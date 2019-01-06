@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.db import transaction
 
 from .decorators import office_required
@@ -166,8 +166,7 @@ def fillshipment(request):
     # initializing objects
     productForm = CreateProductForm()
     shipmentDetailForm = CreateShipmentDetails()
-    shipmentItem_list = None
-    selectedShipment = None
+
 
     # Retrieving The Product types for the ShipmentForm
     productType_list = ProductTypes.objects.all()
@@ -256,7 +255,6 @@ def deleteshipmentdetail(request, pk):
         # we are setting a parameter to mark the item as deleted.
         objShipmentDetail.archived = True
         objShipmentDetail.save()
-
     return redirect('mainSection:fillshipment')
 
 

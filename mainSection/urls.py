@@ -15,7 +15,7 @@ urlpatterns = [
     path('viewhipment/', views.viewshipment, name="viewshipment"),
     path('reviewshipment/', views.reviewShipment, name="reviewshipment"),
     path('costfactor/', views.generateCostFactor, name="costfactor"),
-    path('delete/<int:pk>', views.deleteshipmentdetail, name="deleteshipmentdetail"),
+    path('deleteshipmentdetail/<int:pk>', views.deleteshipmentdetail, name="deleteshipmentdetail"),
     path('finalizeshipment/', views.finalizeshipment, name="finalizeshipment"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

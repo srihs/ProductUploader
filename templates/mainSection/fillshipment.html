@@ -5,329 +5,398 @@
 
 {% block content %}
 
-<!-- Content Header (Page header) -->
+    <!-- Main content -->
+    <section class="content">
 
 
-<section class="content-header">
-    <h1>
-        Fill
-        <small>Shipment</small>
-    </h1>
-    <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Shipment</a></li>
-        <li class="active">Fill Shipment</li>
-    </ol>
-</section>
-
-<!-- Main content -->
-<section class="content">
-    <div class="box box-default">
-
-        <div class="container">
+        <div class="box box-solid box-default">
+            <div class="box-header with-border">
+                <h1 class="box-title">
+                    <strong> Finalize Shipment </strong></h1> - Search and fill shipments -
 
 
-            <div class="row">
-                <div class="box-body">
-                    <div class="row">
-                        <div style="margin-left:auto; margin-right:0;">
-                            <button id="btnFinalize" class="btn btn-danger" type="submit" name="shipmentid" data-toggle="modal"
-                                data-target="#confirmModal">Finalize Shipment</button>
-                        </div>
-                    </div>
-                    
-                    {% if messages %}
+                <div class="box-tools pull-right">
+                </div><!-- /.box-tools -->
+            </div><!-- /.box-header -->
+            <div class="box-body">
+                {% if messages %}
                     <div class="row">
                         <div style="margin-left:auto; margin-right:auto;">
                             {% for message in messages %}
-                            <div class="alert alert-danger alert-dismissible">
-                                <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                                <strong>Error! </strong> <p>{{ message }}</p>
-                            </div>
-                        </div>
-                        {% endfor %}
-                        
+                                <div class="alert alert-danger alert-dismissible">
+                                    <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Error! </strong>
+                                    <p>{{ message }}</p>
+                                </div>
+                                </div>
+                            {% endfor %}
+
                     </div>
-                    {% endif %}
+                {% endif %}
 
 
-                    <h5 style="text-align: center; font-weight: bold; margin-top: 1em">Shipment
-                        Details </h5>
-                    <div style="margin-right: auto; margin-left: auto;">
-
-                        <form id="frmfillShipment" action="{% url 'mainSection:fillshipment' %}" method="GET">
-                            <div class="col-md-12 center">
-                                <div class="row">
-                                    <div class="col-md-2 mb-4">
-                                        <select name="shipmentDropDown" id="shipmentDropDown" class="form-control"
-                                            required>
-                                            <option value="">-Select-</option>
-                                            {% for shipment in shipments %}
-                                            {% if shipment.isClosed %}
-                                            {% endif %}
-                                            <option value="{{shipment.id}}">{{ shipment.shipmentNumber}}
-                                            </option>
-                                            {% endfor %}
-
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-2 mb-4">
-                                        <input id="btnLoad" class="btn btn-primary" style="font-size: 14px;" type="submit"
-                                            name="shipmentid" value="Load" />
-
-                                    </div>
-
-
-                                    <div class="col-md-3 mb-4">
-                                        Shipment Number - <label id="lblShipmentNumber">
-                                            {{selectedShipment.shipmentNumber}}</label>
-
-                                    </div>
-                                    <div class="col-md-3 mb-4">
-                                        Shipment date - {{selectedShipment.shipmentDate}}
-                                    </div>
-
-
-
-                                </div>
-
-
-                            </div>
-
-                        </form>
+                <div class="box box-solid box-primary">
+                    <div class="box-header with-border">
+                        <h1 class="box-title"> 1. Search for a shipment</h1>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                    class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                        <!-- /.box-tools -->
                     </div>
-                    <form id='frmCreateShipmentDetails' action="{% url 'mainSection:saveproduct' %}" method="POST"
-                        enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <!-- header Section-->
-                        <hr class="mb-4">
-                        <!-- End of the header Section-->
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="col-md-4 center">
+                            <form id="frmfillShipment" action="{% url 'mainSection:fillshipment' %}" method="GET">
+                                <div class="col-md-12 center">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <select name="shipmentDropDown" id="shipmentDropDown" class="form-control"
+                                                    required>
+                                                <option value="">-Select-</option>
+                                                {% for shipment in shipments %}
+                                                    {% if shipment.isClosed %}
+                                                    {% endif %}
+                                                    <option value="{{ shipment.id }}">{{ shipment.shipmentNumber }}
+                                                    </option>
+                                                {% endfor %}
 
-                        <div class="col-md-12 center">
-                            <h5 class="mb-3" id="exampleModalLabel">Product Details</h5>
+                                            </select>
+                                        </div>
 
-                            <div class="row">
-                                <div class="col-md-2 mb-4">
-                                    {{productForm.sku}}
+                                        <div class="col-md-2 mb-4">
+                                            <input id="btnLoad" class="btn btn-primary" style="font-size: 14px;"
+                                                   type="submit"
+                                                   name="shipmentid" value="Load"/>
+
+                                        </div>
+
+                                    </div>
+
+
                                 </div>
 
-                                <div class="col-md-2 mb-4">
-                                    {{productForm.weight}}
-
-                                </div>
-
-                                <div class="col-md-2 mb-4">
-
-                                    <select name="productType" placeholder="Ind Price" class="form-control">
-                                        <option>-Select-</option>
-                                        {% for productType in productTypes %}
-                                        <option value='{{ productType.id}}'>{{ productType.productType}}</option>
-                                        {% endfor %}
-                                    </select>
-
-                                </div>
-                                <div class="col-md-3 mb-4">
-                                    {{productForm.vendor}}
-                                </div>
-                                <div class="col-md-3 mb-4">
-                                    {{productForm.img}}
-                                </div>
+                            </form>
+                        </div>
+                        <div class="row" style="margin-left:auto; margin-right:auto; ">
+                            <div class="col-md-3 mb-4">
+                                <strong> Shipment No - </strong>
+                                <p>
+                                    <label id="lblShipmentNumber" class="text-danger">
+                                        <strong> {{ selectedShipment.shipmentNumber }} </strong>
+                                    </label></p>
                             </div>
 
-                        </div>
-
-                        <div class="col-md-12 center">
-                            <h5 class="mb-3" id="exampleModalLabel">Shipping Details</h5>
-
-                            <div class="row">
-
-                                <div class="col-md-2 mb-4">
-                                    {{ShipmentForm.indPrice}}
-
-                                </div>
-
-                                <div class="col-md-2 mb-4">
-                                    {{ShipmentForm.qty}}
-                                </div>
-
-                                <div class="col-md-2 mb-4">
-                                    {{ShipmentForm.billNumber}}
-                                </div>
-
-                                <div class="col-md-2 mb-4">
-                                    {{ShipmentForm.billDate}}
-                                </div>
-                                <div class="col-md-4 mb-4">
-                                    <button type="submit" id="btnAddItem" class="btn btn-primary" style="font-size: 14px;">
-                                        Add Product</button>
-                                </div>
+                            <div class="col-md-3 mb-4">
+                                <strong> Shipment Date -</strong>
+                                <p class="text-danger">
+                                    <strong>  {{ selectedShipment.shipmentDate }} </strong>
+                                </p>
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <strong> Shipping From - </strong>
+                                <p class="text-danger">
+                                    <strong>  {{ selectedShipment.shippingPoint }}</strong>
+                                </p>
                             </div>
 
-                        </div>
-
-                    </form>
-
-
-                    <div class="row">
-                        <div class="box">
-                            <div class="box-body" style="margin: 15px;">
-                                <table id="tblProduct" class="hover" style="width:100%">
-                                    <thead>
-                                        <tr>
-
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;"></th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">SKU</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Type</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Weight (gms)</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Price</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">QTY</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Total
-                                                Amount</th>
-                                            
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Vendor</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Image</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill Number</th>
-                                            <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                        {% for shipmentdetail in shipmentDetails %}
-                                        <tr>
-
-                                            <td> <a href="{% url 'mainSection:deleteshipmentdetail' shipmentdetail.id %}"
-                                                    class="text-danger" onclick="return confirm('You are about to delete. Are you sure?')">
-                                                    <i class="fa fa-times-circle"></i>
-
-                                                </a></td>
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.sku}}</td>
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.types}}</td>
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.weight}}</td>
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.indPrice|intcomma}}</td>
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.qty|intcomma}}</td>
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.totalAmount|intcomma}}</td>
-                                            
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.product.vendor}}</td>
-
-                                            {% if shipmentdetail.product.productImg %}
-                                            <td>
-                                                <p style="text-align:right"><img src="{{shipmentdetail.product.productImg.url}}"
-                                                        width="100px;"></p>
-                                            </td>
-                                            {% else %}
-                                            <td></td>
-                                            {% endif %}
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.billNumber}}</td>
-                                            <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{shipmentdetail.billDate}}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                    <tfoot>
-
-                                    </tfoot>
-                                </table>
+                            <div class="col-md-3 mb-4">
+                                <strong> Buyer - </strong>
+                                <p class="text-danger">
+                                    <strong>  {{ selectedShipment.buyer.first_name }} {{ selectedShipment.buyer.last_name }} </strong>
+                                </p>
                             </div>
                         </div>
                     </div>
-
-
-
-
                     <!-- /.box-body -->
-                    <!-- end of the Grid section -->
+                </div>
+                <div class="box box-solid box-primary">
+                    <div class="box-header with-border">
+                        <h1 class="box-title">2. Add products to the shipment</h1>
 
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                    class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                        <!-- /.box-tools -->
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row" style="margin-left:auto; margin-right:auto; margin-top: 2em">
+                            <form id='frmCreateShipmentDetails' action="{% url 'mainSection:saveproduct' %}"
+                                  method="POST"
+                                  enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="col-md-12 center">
+                                    <div class="row">
+                                        <div class="col-md-2 mb-4">
+                                            {{ productForm.sku }}
+                                        </div>
 
+                                        <div class="col-md-2 mb-4">
+                                            {{ productForm.weight }}
+
+                                        </div>
+
+                                        <div class="col-md-2 mb-4">
+
+                                            <select name="productType" placeholder="Ind Price" class="form-control">
+                                                <option>-Select-</option>
+                                                {% for productType in productTypes %}
+                                                    <option value='{{ productType.id }}'>{{ productType.productType }}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                        </div>
+                                        <div class="col-md-3 mb-4">
+                                            {{ productForm.vendor }}
+                                        </div>
+                                        <div class="col-md-3 mb-4">
+                                            {{ productForm.img }}
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-12 center">
+                                    <div class="row">
+
+                                        <div class="col-md-2 mb-4">
+                                            {{ ShipmentForm.indPrice }}
+
+                                        </div>
+
+                                        <div class="col-md-2 mb-4">
+                                            {{ ShipmentForm.qty }}
+                                        </div>
+
+                                        <div class="col-md-2 mb-4">
+                                            {{ ShipmentForm.billNumber }}
+                                        </div>
+
+                                        <div class="col-md-2 mb-4">
+                                            {{ ShipmentForm.billDate }}
+                                        </div>
+                                        <div class="col-md-4 mb-4">
+                                            <button type="submit" id="btnAddItem" class="btn btn-primary"
+                                                    style="font-size: 14px;">
+                                                Add Product
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <div class="box">
+                    <div class="box-body">
+                        <table id="tblProduct" class="hover" style="width:100%">
+                            <thead>
+                            <tr>
+
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">SKU
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Type
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Weight
+                                    (gms)
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Price
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">QTY
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Total
+                                    Amount
+                                </th>
+
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">
+                                    Vendor
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Image
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
+                                    Number
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
+                                    Date
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {% for shipmentdetail in shipmentDetails %}
+                                <tr>
+
+                                    <td><a href="{% url 'mainSection:deleteshipmentdetail' shipmentdetail.id %}"
+                                           class="text-danger"
+                                           onclick="return confirm('You are about to delete. Are you sure?')">
+                                        <i class="fa fa-times-circle"></i>
+
+                                    </a></td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.sku }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.types }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.weight }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.indPrice|intcomma }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.qty|intcomma }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.totalAmount|intcomma }}</td>
+
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.vendor }}</td>
+
+                                    {% if shipmentdetail.product.productImg %}
+                                        <td>
+                                            <p style="text-align:right"><img
+                                                    src="{{ shipmentdetail.product.productImg.url }}"
+                                                    width="100px;"></p>
+                                        </td>
+                                    {% else %}
+                                        <td></td>
+                                    {% endif %}
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billNumber }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billDate }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
 
+                <!-- /.box-body -->
+                <!-- end of the Grid section -->
+
+            </div><!-- /.box-body -->
+            <div class="box-footer">
+                <div class="row">
+                    <div style="margin-left:auto; margin-right:20px;">
+                        <button id="btnFinalize" class="btn btn-danger" type="submit" name="shipmentid"
+                                data-toggle="modal"
+                                data-target="#confirmModal">Finalize Shipment
+                        </button>
+                    </div>
+                </div>
+            </div><!-- box-footer -->
 
 
+        </div>
+
+    </section>
+    <!-- /.content -->
+    <!-- Modal -->
+    <form action="{% url 'mainSection:finalizeshipment' %}" method="POST">
+        {% csrf_token %}
+        <div class="modal" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Shipment Finalization</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>You are about to finalize the shipment No - {{ selectedShipment.shipmentNumber }}.</p>
+                        <p>Once Finalized you cannot modify the shipment. Are you sure?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Finalize</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
-<!-- /.content -->
-<!-- Modal -->
-<form action="{% url 'mainSection:finalizeshipment' %}" method="POST">
-    {% csrf_token %}
-    <div class="modal" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Shipment Finalization</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
+    </form>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <div class="modal" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Delete product from shipment</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
 
-                <div class="modal-body">
-                    <p>You are about to finalize the shipment No - {{selectedShipment.shipmentNumber}}.</p>
-                    <p>Once Finalized you cannot modify the shipment. Are you sure?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-danger">Finalize</button>
+                    <div class="modal-body">
+                        <p>You are about to delete this product.</p>
+                        <p>Are you sure?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-danger"> <a "></a></input>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
 {% endblock content %}
 
 
 {% block scripts %}
-<script src="{% static '/js/select2.full.min.js' %}"></script>
-<script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static '/js/select2.full.min.js' %}"></script>
+    <script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
 
 
 
-<script>
+    <script>
 
-    $(document).ready(function () {
-        // This funtion will determine if a shipment is loaded. if not, This function will disable the add product button.
-        if ($("#lblShipmentNumber").text().trim().length > 2) {
-            document.getElementById("btnAddItem").disabled = false;
-            document.getElementById("divStatus").style.visibility = 'visible';
-            document.getElementById("btnFinalize").disabled = false;
+        $(document).ready(function () {
+            // This funtion will determine if a shipment is loaded. if not, This function will disable the add product button.
+            if ($("#lblShipmentNumber").text().trim().length > 2) {
+                document.getElementById("btnAddItem").disabled = false;
+                document.getElementById("divStatus").style.visibility = 'visible';
+                document.getElementById("btnFinalize").disabled = false;
 
-        } else {
-            document.getElementById("btnAddItem").disabled = true;
-            document.getElementById("btnFinalize").disabled = true;
+            } else {
+                document.getElementById("btnAddItem").disabled = true;
+                document.getElementById("btnFinalize").disabled = true;
 
-        }
-    });
+            }
+        });
 
-    // This funtion is related to Datagrid Table
-    $(function () {
+        // This funtion is related to Datagrid Table
+        $(function () {
 
-        $('#tblProduct').DataTable({
-            'paging': true,
-            'searching': false,
-            'ordering': true,
-            'info': true,
-            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            'autoWidth': true
+            $('#tblProduct').DataTable({
+                'paging': true,
+                'searching': false,
+                'ordering': true,
+                'info': true,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                'autoWidth': true
+            })
+        });
+
+
+    </script>
+
+    <script>
+
+        $(function () {
+            //Initialize Select2 Elements
+            $('.select2').select2()
+            $('#datepicker2').datepicker({autoclose: true,});
+
         })
-    });
+    </script>
 
-
-
-</script>
-
-<script>
-
-    $(function () {
-        //Initialize Select2 Elements
-        $('.select2').select2()
-        $('#datepicker2').datepicker({ autoclose: true, });
-
-    })
-</script>
-
-<script>
-    $('#frmfillShipment').submit(function () {
-        document.getElementById("loading").style.display = "visible";
-    });
-</script>
+    <script>
+        $('#frmfillShipment').submit(function () {
+            document.getElementById("loading").style.display = "visible";
+        });
+    </script>
 
 {% endblock scripts %}
