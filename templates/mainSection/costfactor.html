@@ -1,85 +1,199 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 
 {% block content %}
 
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-        <h1>
-            Create
-            <small>Shipment</small>
-        </h1>
-        <ol class="breadcrumb">
-            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-            <li><a href="#">Shipment</a></li>
-            <li class="active">Create Shipment</li>
-        </ol>
-    </section>
 
-    <!-- Main content -->
+
+
     <section class="content">
-        <div class="box box-default">
-            <div class="container">
-                <form id='frmCreateCost' action="{% url 'mainSection:costfactor' %}" method="POST"
-                      enctype="multipart/form-data">
-                    {% csrf_token %}
+        <!-- Main content -->
 
-                    <h4 style="text-align: center; margin-top: 2em">Shipment Details</h4>
-
-                    <div class="box-body">
-                        <h6 style="text-align: center; font-weight: bold;">Shipment Number
-                        </h6>
-                        <div class="im-centered row">
-                            <div class="col-md-2 mb-4" style="margin-right: auto; margin-left: auto;">
-                                <select name="shipmentDropDown" id="shipmentDropDown" class="form-control"
-                                        required>
-                                    <option value="">-Select Shipment-</option>
-                                    {% for shipment in shipments %}
-                                        <option value="{{ shipment.id }}">{{ shipment.shipmentNumber }}
-                                        </option>
-                                    {% endfor %}
-
-                                </select>
-
-                            </div>
-                        </div>
-
-                        <h6 style="text-align: center; font-weight: bold;">Cost
-                            Base: </h6>
-                        <div class="col-md-2 mb-4" style="margin-right: auto; margin-left: auto;">
-                            {{ form.costBase }}
-
-                        </div>
-                        <h6 style="text-align: center; font-weight: bold;">Shipment Date:</h6>
-                        <div class="col-md-4 mb-4" style="margin-right: auto; margin-left: auto;">
-                            {{ form.costFile }}
-                        </div>
-
-                        <div class="d-flex flex-row justify-content-center align-items-center">
-                            <button id="btnCreateShipment" type="submit" class="btn btn-danger"> Assign Cost Base
-                            </button>
-                        </div>
-                    </div>
-
+        <div class="box box-solid box-default">
+            <div class="box-header with-border">
+                <h1 class="box-title">
+                    <strong> Cost
+                        Shipment </strong></h1> - Assign a cost base to a shipments -
+                <div class="box-tools pull-right">
+                </div><!-- /.box-tools -->
+            </div><!-- /.box-header -->
+            <div class="box-body">
                 {% if messages %}
                     <div class="row">
-                        <div class="d-flex flex-row justify-content-center align-items-center">
+                        <div style="margin-left:auto; margin-right:auto;">
                             {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }}" role="alert">
+                                <div class="alert alert-danger alert-dismissible">
+                                    <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Error! </strong>
                                     <p>{{ message }}</p>
                                 </div>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                </div>
                             {% endfor %}
-                        </div>
 
                     </div>
                 {% endif %}
+
+                <form id='frmCreateCost' action="{% url 'mainSection:costfactor' %}" method="POST"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="box box-solid box-primary">
+                        <div class="box-header with-border">
+                            <h1 class="box-title"> 1. Search for a shipment</h1>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                            <!-- /.box-tools -->
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div class="col-md-4 center">
+
+                                <div class="im-centered row">
+                                    <div class="col-md-8 mb-6">
+                                        <select name="shipmentDropDown" id="shipmentDropDown"
+                                                class="form-control"
+                                                required>
+                                            <option value="">-Shipment Number-</option>
+                                            {% for shipment in shipments %}
+                                                {% if shipment.isClosed %}
+                                                {% endif %}
+                                                <option value="{{ shipment.id }}">{{ shipment.shipmentNumber }}
+                                                </option>
+                                            {% endfor %}
+
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-2 mb-4">
+                                        <input id="btnLoad" class="btn btn-primary" style="font-size: 14px;"
+                                               type="submit"
+                                               name="shipmentid" value="Search"/>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
                 </form>
-            </div>
+                <form id='frmCreateCost' action="{% url 'mainSection:costfactor' %}" method="POST"
+                      enctype="multipart/form-data">
+                    <div class="box box-solid box-primary">
+                        <div class="box-header with-border">
+                            <h1 class="box-title">2. Review the shipment</h1>
+
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                            <!-- /.box-tools -->
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div class="row" style="margin-left:auto; margin-right:auto; margin-top: 2em">
+                                <div class="col-md-3 mb-4">
+                                    <strong> Shipment No - </strong>
+                                    <p class="text-danger"><strong> {{ selectedShipment.shipmentNumber }} </strong>
+                                    </p>
+                                </div>
+
+                                <div class="col-md-3 mb-4">
+                                    <strong> Shipment Date -</strong>
+                                    <p class="text-danger"><strong>  {{ selectedShipment.shipmentDate }} </strong>
+                                    </p>
+                                </div>
+
+
+                                <div class="col-md-3 mb-4">
+                                    <strong> Shipment Total -</strong>
+                                    <p class="text-danger"><strong> {{ shipmentTotal|intcomma }}</strong></p>
+
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <strong> Shipment Qty - </strong>
+                                    <p class="text-danger"><strong> {{ shipmentTotalQty|intcomma }} </strong></p>
+                                </div>
+
+                                <div class="col-md-3 mb-4">
+                                    <strong> Shipping From - </strong>
+                                    <p class="text-danger"><strong>  {{ selectedShipment.shippingPoint }}</strong>
+                                    </p>
+                                </div>
+
+                                <div class="col-md-3 mb-4">
+                                    <strong> Buyer - </strong>
+                                    <p class="text-danger">
+                                        <strong>  {{ selectedShipment.buyer.first_name }} {{ selectedShipment.buyer.last_name }} </strong>
+                                    </p>
+                                </div>
+
+                                <div class="col-md-3 mb-4">
+                                    <strong> Shipment Weight (Tot.) - </strong>
+                                    <p class="text-danger"><strong>  {{ shippingWeightKG }} Kgs </strong></p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <div class="box box-solid box-primary">
+                        <div class="box-header with-border">
+                            <h1 class="box-title">3. Assign the cost base</h1>
+
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                            <!-- /.box-tools -->
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div class="row" style="margin-left:auto; margin-right:auto; margin-top: 2em">
+                                <div class="col-md-2 mb-4">
+                                    <strong> Cost Base - </strong>
+                                    <p class="text-danger"><strong> {{ form.costBase }}</strong>
+                                    </p>
+                                </div>
+
+                                <div class="col-md-4 mb-4">
+                                    <strong> Cost File - </strong>
+                                    <p class="text-danger"><strong> {{ form.costFile }}</strong>
+                                    </p>
+                                </div>
+                                <div class="col-md-4 mb-4">
+                                    <strong> Note - </strong>
+                                    <p class="text-danger"> <strong> Please make sure that cost file is named as  {{ selectedShipment.shipmentNumber }}.xls </strong>
+                                    </p>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div style="margin-left:auto; margin-right:20px;">
+                                    <button id="btnFinalize" class="btn btn-danger" type="submit" name="shipmentid"
+                                            data-toggle="modal"
+                                            data-target="#confirmModal">Update Shipment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- /.box-body -->
+                    </div>
+                </form>
+                <!-- /.box-body -->
+                <!-- end of the Grid section -->
+            </div><!-- /.box-body -->
+            <div class="box-footer">
+
+            </div><!-- box-footer -->
+
         </div>
+
 
 
     </section>

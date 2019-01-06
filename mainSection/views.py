@@ -289,26 +289,49 @@ def generateCostFactor(request):
         return render(request, '../templates/mainSection/costfactor.html', {'form': form, 'shipments': shipment_list})
 
     if request.method == 'POST':
-        form = CreateCostFactorForm(request.POST, request.FILES)
-        if form.is_valid():
-            shipmnetID = request.POST.get('shipmentDropDown')
-            objShipment = get_object_or_404(Shipment,pk=shipmnetID)
-            objShipment.isCostbaseFinalized = True
-            objShipment.costBase = form.cleaned_data['costBase']
-            # assigning the cost file
-            objShipment.costFile = form.cleaned_data['costFile']
+            # if the request if for a shipment that is selected in the dropdown the the following code block will execute
+            if request.POST.get('shipmentDropDown'):
+                # getting the shipmentID
+                shipmentID = request.POST.get('shipmentDropDown')
+                # Saving the selected Shipment object to passback to the template
+                selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
 
-            shipmentItem_list = getShipmentItemsList(shipmnetID)
+                shipmentItem_list = getShipmentItemsList(shipmentID)
+                shipmentTotal = 0
+                shipmentTotalQty = 0
+                shippingWeight=0
 
-            for shipmentItem in shipmentItem_list:
-                shipmentItem.costBase = objShipment.costBase
-                shipmentItem.save()
+                for shipment in shipmentItem_list:
+                    shipmentTotal += shipment.totalAmount
+                    shipmentTotalQty += shipment.qty
+                    shippingWeight += shipment.weight * shipment.qty
 
-            objShipment.save()
-            form = CreateCostFactorForm() # Added this to clear the previous values for fields
+                shippingWeightKG = shippingWeight / 1000
 
-        else:
-            messages.error(request, "Something went wrong.")
+                print(shipmentTotal)
+                print(shipmentTotalQty)
+            else:
+                form = CreateCostFactorForm(request.POST, request.FILES)
+                if form.is_valid():
+                    shipmnetID = request.POST.get('shipmentDropDown')
+                    objShipment = get_object_or_404(Shipment, pk=shipmnetID)
+                    objShipment.isCostbaseFinalized = True
+                    objShipment.costBase = form.cleaned_data['costBase']
+                    # assigning the cost file
+                    objShipment.costFile = form.cleaned_data['costFile']
+
+                    shipmentItem_list = getShipmentItemsList(shipmnetID)
+
+                    for shipmentItem in shipmentItem_list:
+                        shipmentItem.costBase = objShipment.costBase
+                        shipmentItem.save()
+
+                    objShipment.save()
+                    form = CreateCostFactorForm()  # Added this to clear the previous values for fields
+
+                else:
+                        messages.error(request, "Something went wrong.")
 
     return render(request, '../templates/mainSection/costfactor.html',
-                  {'form': form, 'shipments': shipment_list})
+                  {'form': form, 'shipments': shipment_list,'shipmentTotal': shipmentTotal,
+                   'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment,'shippingWeightKG':shippingWeightKG})
