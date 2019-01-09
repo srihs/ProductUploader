@@ -36,6 +36,11 @@ class CreateProductForm(forms.ModelForm):
                'required': 'true', 'placeholder': 'Weight in gms'}
     ))
 
+    sellingPrice = forms.DecimalField(max_digits=10, widget=forms.NumberInput(
+        attrs={'class': 'form-control', 'id': 'sellingPrice',
+               'required': 'true', 'placeholder': 'Selling Price'}
+    ))
+
     img = forms.ImageField(widget=forms.FileInput(
         attrs={'class': 'form-control', 'id': 'productImage',
                'required': 'false'}
@@ -71,9 +76,14 @@ class CreateShipmentDetails(forms.ModelForm):
     billDate = forms.DateField(required=True, widget=forms.DateInput(
         attrs={'class': 'form-control','style': 'text-align: center;', 'id': 'datepicker2','placeholder': 'Bill Date'}))
 
+    sellingPrice = forms.DecimalField(max_digits=10, widget=forms.NumberInput(
+        attrs={'class': 'form-control', 'id': 'sellingPrice',
+               'required': 'true', 'placeholder': 'Selling Price'}
+    ))
+
     class Meta:
         model = ShipmentDetail
-        fields = ['indPrice', 'qty' , 'billDate','billNumber']
+        fields = ['indPrice', 'qty' , 'billDate','billNumber', 'sellingPrice']
 
 
 class CreateCostFactorForm(forms.ModelForm):

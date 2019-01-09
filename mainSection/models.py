@@ -93,6 +93,8 @@ class ShipmentDetail(models.Model):
         decimal_places=2, max_digits=10, null=True, blank=True)
     sellingPrice75 = models.DecimalField(
         decimal_places=2, max_digits=10, null=True, blank=True)
+    sellingPrice = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
     billDate = models.DateField(default=timezone.now)
     billNumber = models.PositiveIntegerField(null=True, blank=True)
     is_checked = models.BooleanField(default='False')

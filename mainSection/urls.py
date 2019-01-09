@@ -17,6 +17,7 @@ urlpatterns = [
     path('costfactor/', views.generateCostFactor, name="costfactor"),
     path('deleteshipmentdetail/<int:pk>', views.deleteshipmentdetail, name="deleteshipmentdetail"),
     path('finalizeshipment/', views.finalizeshipment, name="finalizeshipment"),
+    path('updateproduct/<int:pk>/', views.updateproduct, name="updateproduct"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

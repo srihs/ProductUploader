@@ -35,8 +35,8 @@
                     </div>
                 {% endif %}
 
-                <form id='frmCreateCost' action="{% url 'mainSection:costfactor' %}" method="POST"
-                      enctype="multipart/form-data">
+                <form id='frmSearchShipment' action="{% url 'mainSection:costfactor' %}" method="POST"
+                     >
                     {% csrf_token %}
                     <div class="box box-solid box-primary">
                         <div class="box-header with-border">
@@ -82,6 +82,7 @@
                 </form>
                 <form id='frmCreateCost' action="{% url 'mainSection:costfactor' %}" method="POST"
                       enctype="multipart/form-data">
+                    {% csrf_token %}
                     <div class="box box-solid box-primary">
                         <div class="box-header with-border">
                             <h1 class="box-title">2. Review the shipment</h1>

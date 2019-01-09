@@ -1,0 +1,19 @@
+<form id='frmCreateShipmentDetails' action="{% url 'mainSection:updateproduct' form.instance.pk %}"
+      method="POST">
+    {% csrf_token %}
+    <div class="col-md-12 center">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                {{ form.sellingPrice }}
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Close"></input>
+            <input type="submit" class="btn btn-danger" value="Update"></input>
+        </div>
+
+
+    </div>
+</form>
