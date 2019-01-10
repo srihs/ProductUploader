@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.db import transaction
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from decimal import *
+import math
 
 
 from .decorators import office_required
@@ -385,11 +387,14 @@ def updateproduct(request, pk):
         if objShipmentDetail is not None:
             print('here')
             objShipmentDetail.sellingPrice = request.POST['sellingPrice']
-            objShipmentDetail.is_checked = True
-            # productObj.productImage=file
-            objShipmentDetail.save()
 
-            print('saved')
+            if Decimal(objShipmentDetail.sellingPrice50) > Decimal(objShipmentDetail.sellingPrice):
+                messages.error(request, "Recommended selling price is  Rs." + str(objShipmentDetail.sellingPrice50) +".00 . You have entered a price less than the recommended Price.")
+            else:
+                objShipmentDetail.is_checked = True
+                # productObj.productImage=file
+                objShipmentDetail.save()
+
     else:
         print('GET')
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
