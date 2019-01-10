@@ -130,14 +130,10 @@ def viewshipment(request):
 @login_required
 @office_required
 def reviewShipment(request):
-    print(request.method)
-    print(request.session[
-        'shipmentID'])
     shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='1', isCostbaseFinalized='1')
 
     if request.method == 'GET':
         if request.method == 'GET' and request.session['shipmentID'] is not None:
-            print('here')
             shipmentID = request.session['shipmentID']
             # Saving the selected Shipment object to passback to the template
             # selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
@@ -156,6 +152,7 @@ def reviewShipment(request):
             shippingWeightKG = shippingWeight / 1000
 
         else:
+            print('here')
             request.session['shipmentID'] = None
             request.session.modified = True
             return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
@@ -377,23 +374,26 @@ def generateCostFactor(request):
                    'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment,'shippingWeightKG':shippingWeightKG})
 
 
+@transaction.atomic
+@login_required
+@office_required
 def updateproduct(request, pk):
     data = dict()
 
     if request.method == 'POST':
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
-        form = CreateShipmentDetails(request.POST)
 
         if objShipmentDetail is not None:
-            print('here')
             objShipmentDetail.sellingPrice = request.POST['sellingPrice']
-
-            if Decimal(objShipmentDetail.sellingPrice50) > Decimal(objShipmentDetail.sellingPrice):
-                messages.error(request, "Recommended selling price is  Rs." + str(objShipmentDetail.sellingPrice50) +".00 . You have entered a price less than the recommended Price.")
+            if Decimal(objShipmentDetail.cost) > Decimal(objShipmentDetail.sellingPrice):
+                messages.error(request, "Cost for the item is  Rs." + str(round(objShipmentDetail.cost,2)) +" . You have entered a price less than the cost.")
             else:
                 objShipmentDetail.is_checked = True
                 # productObj.productImage=file
                 objShipmentDetail.save()
+                objProject = Products.objects.get(pk=objShipmentDetail.product.id)
+                objProject.sellingPrice = request.POST['sellingPrice']
+                objProject.save()
 
     else:
         print('GET')
@@ -403,6 +403,23 @@ def updateproduct(request, pk):
         context = {'form': form}
         data['html_form'] = render_to_string('../templates/mainSection/partials/editproduct.html', context, request=request)
         return JsonResponse(data)
+
+    return redirect('mainSection:reviewshipment')
+
+
+def closeshipment(request):
+    if request.method == 'POST':
+        shipmentItem_list = ShipmentDetail.objects.filter(shipment=request.session['shipmentID'], archived='0',is_checked='0')
+        if shipmentItem_list.count() > 0 :
+            messages.error(request, "There are " + str(shipmentItem_list.count()) + " item(s) that need to be review. Please make sure all the items are reviewed. ")
+        else:
+            objShipment = Shipment.objects.get(pk=request.session['shipmentID'])
+            objShipment.isClosed = True
+            objShipment.save()
+            # clearing the session form the system. so the New id will be facilitated
+            request.session['shipmentID'] = None
+            request.session.modified = True
+            messages.success(request, messages.INFO, "Shipment " + objShipment.shipmentNumber +  " Closed")
 
     return redirect('mainSection:reviewshipment')
 

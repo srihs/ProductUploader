@@ -22,9 +22,9 @@
                     <div class="row">
                         <div style="margin-left:auto; margin-right:auto;">
                             {% for message in messages %}
-                                <div class="alert alert-danger alert-dismissible">
+                                <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible"{% endif %}>
                                     <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                                    <strong>Error! </strong>
+                                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
                                     <p>{{ message }}</p>
                                 </div>
                                 </div>
@@ -79,7 +79,7 @@
                 </div>
                 <div class="box box-solid box-primary">
                     <div class="box-header with-border">
-                        <h1 class="box-title">2. Search results</h1>
+                        <h1 class="box-title">2. Review the shipment</h1>
 
                         <div class="box-tools pull-right">
                             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
@@ -187,12 +187,14 @@
                                 <tr>
 
                                     {% if shipmentdetail.is_checked %}
-                                        <td><button id="btnModel" type="button"
+                                        <td>
+                                            <button id="btnModel" type="button"
                                                     data-url="{% url 'mainSection:updateproduct' shipmentdetail.product.id %}"
                                                     class="btn btn-primary js-update">
                                                 <i class="fa fa-check-circle"></i>
 
-                                            </button></td>
+                                            </button>
+                                        </td>
                                     {% else %}
                                         <td>
                                             <button id="btnModel" type="button"
@@ -225,13 +227,13 @@
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billNumber }}</td>
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billDate }}</td>
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">
-                                        {{ shipmentdetail.cost|floatformat:"0"|intcomma}}</td>
+                                        {{ shipmentdetail.cost|floatformat:2 }}</td>
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">
-                                        {{ shipmentdetail.sellingPrice50|floatformat:"0"|intcomma}}</td>
+                                        {{ shipmentdetail.sellingPrice50|floatformat:2|intcomma}}</td>
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">
-                                        {{ shipmentdetail.sellingPrice75|floatformat:"0"|intcomma}}</td>
+                                        {{ shipmentdetail.sellingPrice75|floatformat:2|intcomma}}</td>
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">
-                                        {{ shipmentdetail.sellingPrice|floatformat:"0"|intcomma}}</td>
+                                        {{ shipmentdetail.sellingPrice|floatformat:2|intcomma}}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -246,9 +248,20 @@
                 <!-- end of the Grid section -->
 
             </div><!-- /.box-body -->
+        <form id="frmsearchShipmentClose" action="{% url 'mainSection:closeshipment' %}"
+                                  method="POST">
+            {% csrf_token %}
             <div class="box-footer">
-
+                <div class="row">
+                    <div style="margin-left:auto; margin-right:20px;">
+                        <button id="btnFinalize" class="btn btn-danger" type="submit" name="shipmentid"
+                                data-toggle="modal"
+                                data-target="#confirmModal">Close Shipment
+                        </button>
+                    </div>
+                </div>
             </div><!-- box-footer -->
+        </form>
 
         </div>
 
@@ -284,7 +297,7 @@
 
     <script>
         $(function () {
-            var btn =null;
+            var btn = null;
             $('button[id="btnModel"]').click(function () {
                 var btn = $(this);
                 $.ajax({
