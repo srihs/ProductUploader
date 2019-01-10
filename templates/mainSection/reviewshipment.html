@@ -189,7 +189,7 @@
                                     {% if shipmentdetail.is_checked %}
                                         <td><button id="btnModel" type="button"
                                                     data-url="{% url 'mainSection:updateproduct' shipmentdetail.product.id %}"
-                                                    class="btn btn-primary">
+                                                    class="btn btn-primary js-update">
                                                 <i class="fa fa-check-circle"></i>
 
                                             </button></td>
@@ -197,15 +197,13 @@
                                         <td>
                                             <button id="btnModel" type="button"
                                                     data-url="{% url 'mainSection:updateproduct' shipmentdetail.product.id %}"
-                                                    class="btn btn-danger">
+                                                    class="btn btn-danger js-update">
                                                 <i class="fa fa-check-circle"></i>
 
                                             </button>
                                         </td>
 
                                     {% endif %}
-
-
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.sku }}</td>
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.types }}</td>
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.weight }}</td>
@@ -286,15 +284,14 @@
 
     <script>
         $(function () {
-
-            $("#btnModel").click(function () {
+            var btn =null;
+            $('button[id="btnModel"]').click(function () {
                 var btn = $(this);
                 $.ajax({
                     url: btn.attr("data-url"),
                     type: 'get',
                     dataType: 'json',
                     beforeSend: function () {
-                        $("#reviewModal .modal-body").html("");
                         $("#reviewModal").modal("show");
 
                     },

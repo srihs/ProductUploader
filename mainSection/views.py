@@ -128,12 +128,35 @@ def viewshipment(request):
 @login_required
 @office_required
 def reviewShipment(request):
+    print(request.method)
+    print(request.session[
+        'shipmentID'])
     shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='1', isCostbaseFinalized='1')
 
     if request.method == 'GET':
-        request.session['shipmentID'] = None
-        request.session.modified = True
-        return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
+        if request.method == 'GET' and request.session['shipmentID'] is not None:
+            print('here')
+            shipmentID = request.session['shipmentID']
+            # Saving the selected Shipment object to passback to the template
+            # selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
+            selectedShipment = Shipment.objects.get(pk=shipmentID)
+
+            shipmentItem_list = getShipmentItemsList(shipmentID)
+            shipmentTotal = 0
+            shipmentTotalQty = 0
+            shippingWeight = 0
+
+            for shipment in shipmentItem_list:
+                shipmentTotal += shipment.totalAmount
+                shipmentTotalQty += shipment.qty
+                shippingWeight += shipment.weight * shipment.qty
+
+            shippingWeightKG = shippingWeight / 1000
+
+        else:
+            request.session['shipmentID'] = None
+            request.session.modified = True
+            return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
 
     if request.method == 'POST':
         # if the request if for a shipment that is selected in the dropdown the the following code block will execute
@@ -156,28 +179,7 @@ def reviewShipment(request):
 
             shippingWeightKG = shippingWeight / 1000
 
-    if request.method == 'GET' and request is not None and 'shipmentID' in request.session and request.session[
-        'shipmentID'] is not None:
 
-        shipmentID = request.session['shipmentID']
-        # Saving the selected Shipment object to passback to the template
-        # selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
-        selectedShipment = Shipment.objects.get(pk=shipmentID)
-
-        shipmentItem_list = getShipmentItemsList(shipmentID)
-        shipmentTotal = 0
-        shipmentTotalQty = 0
-        shippingWeight = 0
-
-        for shipment in shipmentItem_list:
-            shipmentTotal += shipment.totalAmount
-            shipmentTotalQty += shipment.qty
-            shippingWeight += shipment.weight * shipment.qty
-
-        shippingWeightKG = shippingWeight / 1000
-
-    else:
-            messages.error(request, "Something went wrong.")
 
     return render(request, '../templates/mainSection/reviewshipment.html',
                   {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal,
@@ -375,10 +377,11 @@ def generateCostFactor(request):
 
 def updateproduct(request, pk):
     data = dict()
+
     if request.method == 'POST':
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
         form = CreateShipmentDetails(request.POST)
-        print('here')
+
         if objShipmentDetail is not None:
             print('here')
             objShipmentDetail.sellingPrice = request.POST['sellingPrice']
