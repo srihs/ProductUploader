@@ -400,7 +400,8 @@ def updateproduct(request, pk):
 
     return redirect('mainSection:reviewshipment')
 
-
+@login_required
+@office_required
 def closeshipment(request):
     if request.method == 'POST':
         shipmentItem_list = ShipmentDetail.objects.filter(shipment=request.session['shipmentID'], archived='0',is_checked='0')
@@ -416,6 +417,24 @@ def closeshipment(request):
             messages.success(request, "Shipment " + objShipment.shipmentNumber +  " Closed")
 
     return redirect('mainSection:reviewshipment')
+
+
+def viewproduct(request):
+    if request.method =='GET':
+        return render(request, '../templates/mainSection/viewitem.html')
+
+    if request.method == 'POST':
+        sku = request.POST['SKU']
+        print(sku)
+
+        objProduct = Products.objects.select_related('types').get(sku=sku)
+        print(objProduct.id)
+        objShipping_list = ShipmentDetail.objects.filter(product__id=objProduct.id).select_related('shipment')
+    return render(request, '../templates/mainSection/viewitem.html', {'Product': objProduct, 'objShipping_list': objShipping_list})
+
+
+
+
 
 
 

@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block content %}
+    <!-- Main content -->
+    <section class="content">
+
+        <div class="box box-solid box-default">
+            <div class="box-header with-border">
+                <h1 class="box-title">
+                    <strong> View
+                        Item </strong></h1> - View item details -
+
+
+                <div class="box-tools pull-right">
+                </div><!-- /.box-tools -->
+            </div><!-- /.box-header -->
+            <div class="box-body">
+                {% if messages %}
+                    <div class="row">
+                        <div style="margin-left:auto; margin-right:auto;">
+                            {% for message in messages %}
+                                <div {% if message.tags %}
+                                    class="alert alert-{{ message.tags }} alert-dismissible"{% endif %}>
+                                    <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+
+                                    <p>{{ message }}</p>
+                                </div>
+                                </div>
+                            {% endfor %}
+
+                    </div>
+                {% endif %}
+
+
+                <div class="box box-solid box-primary">
+                    <div class="box-header with-border">
+                        <h1 class="box-title"> 1. Search for an item</h1>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                    class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                        <!-- /.box-tools -->
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="col-md-4 center">
+                            <form id="frmsearchShipment" action="{% url 'mainSection:viewproduct' %}"
+                                  method="POST">
+                                {% csrf_token %}
+                                <div class="im-centered row">
+                                    <div class="col-md-8 mb-6">
+                                        <div class="input-group mb-3">
+                                            <input type="text" name="SKU" class="form-control" placeholder="SKU"
+                                                   aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                            <div class="input-group-append">
+                                                <button type="submit" class="btn btn-primary" type="button">Search
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <div class="box box-solid box-primary">
+                    <div class="box-header with-border">
+                        <h1 class="box-title">2. Item details</h1>
+
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                    class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                        <!-- /.box-tools -->
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row" style="margin-left:auto; margin-right:auto; margin-top: 2em">
+                            <div class="col-md-3 mb-4">
+                                <strong> SKU - </strong>
+                                <p class="text-danger"><strong> {{ Product.sku }} </strong>
+                                </p>
+                            </div>
+
+                            <div class="col-md-3 mb-4">
+                                <strong> Weight (in gms) -</strong>
+                                <p class="text-danger"><strong>  {{ Product.weight }} </strong>
+                                </p>
+                            </div>
+
+
+                            <div class="col-md-3 mb-4">
+                                <strong> Vendor -</strong>
+                                <p class="text-danger"><strong> {{ Product.vendor }}</strong></p>
+
+                            </div>
+
+                            <div class="col-md-3 mb-4">
+                                <strong> Type - </strong>
+                                <p class="text-danger"><strong>  {{ Product.types }}</strong>
+                                </p>
+                            </div>
+
+                            <div class="col-md-3 mb-4">
+                                <strong> Image - </strong>
+                                <p><img
+                                        src="{{ Product.productImg.url }}"
+                                        width="200px;"></p>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <div class="box">
+                    <div class="box-body">
+                        <table id="tblProduct" class="hover" style="width:100%">
+                            <thead>
+                            <tr>
+
+
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Shipment Number
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Price
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">QTY
+                                </th>
+
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
+                                    Number
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
+                                    Date
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Cost
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Selling
+                                    price 50%
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Selling
+                                    price 75%
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Selling
+                                    price
+                                </th>
+                                 <th style="text-align: right; max-width:100%; word-wrap:break-word;">Buyer
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {% for shipmentdetail in objShipping_list %}
+                                <tr>
+
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.shipment.shipmentNumber }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.indPrice|intcomma }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.qty }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billNumber }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billDate }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">
+                                        {{ shipmentdetail.cost|floatformat:2 }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">
+                                        {{ shipmentdetail.sellingPrice50|floatformat:2|intcomma}}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">
+                                        {{ shipmentdetail.sellingPrice75|floatformat:2|intcomma}}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">
+                                        {{ shipmentdetail.sellingPrice|floatformat:2|intcomma}}</td>
+                                <td style="text-align: right; max-width:100%; word-wrap:break-word;">
+                                        {{ shipmentdetail.shipment.buyer}}</td>
+
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- /.box-body -->
+                <!-- end of the Grid section -->
+
+            </div><!-- /.box-body -->
+
+
+            <div class="box-footer">
+
+            </div><!-- box-footer -->
+
+
+        </div>
+
+
+    </section>
+    <!-- /.content -->
+    <!-- Modal -->
+    <div class="modal" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reviewModalLabel">Product Review</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+
+{% block scripts %}
+    <script src="{% static '/js/select2.full.min.js' %}"></script>
+    <script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
+
+    <script>
+        $(function () {
+            var btn = null;
+            $('button[id="btnModel"]').click(function () {
+                var btn = $(this);
+                $.ajax({
+                    url: btn.attr("data-url"),
+                    type: 'get',
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $("#reviewModal").modal("show");
+
+                    },
+                    success: function (data) {
+                        $("#reviewModal .modal-body").html(data.html_form);
+                    }
+                });
+            });
+
+        });
+
+    </script>
+
+
+    <script>
+
+        // This funtion is related to Datagrid Table
+        $(function () {
+
+            $('#tblProduct').DataTable({
+                'paging': true,
+                'searching': false,
+                'ordering': true,
+                'info': true,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                'autoWidth': true
+            })
+        });
+
+
+    </script>
+
+    <script>
+        $('#frmfillShipment').submit(function () {
+            document.getElementById("loading").style.display = "visible";
+        });
+    </script>
+
+{% endblock scripts %}
