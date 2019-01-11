@@ -152,7 +152,6 @@ def reviewShipment(request):
             shippingWeightKG = shippingWeight / 1000
 
         else:
-            print('here')
             request.session['shipmentID'] = None
             request.session.modified = True
             return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
@@ -164,7 +163,6 @@ def reviewShipment(request):
             shipmentID = request.POST.get('shipmentDropDown')
             request.session['shipmentID'] = shipmentID
             # Saving the selected Shipment object to passback to the template
-            #selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
             selectedShipment = Shipment.objects.get(pk=shipmentID)
             shipmentItem_list = getShipmentItemsList(shipmentID)
             shipmentTotal = 0
@@ -177,8 +175,6 @@ def reviewShipment(request):
                 shippingWeight += shipment.weight * shipment.qty
 
             shippingWeightKG = shippingWeight / 1000
-
-
 
     return render(request, '../templates/mainSection/reviewshipment.html',
                   {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal,
@@ -396,9 +392,7 @@ def updateproduct(request, pk):
                 objProject.save()
 
     else:
-        print('GET')
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
-        print(objShipmentDetail)
         form = CreateShipmentDetails(instance=objShipmentDetail)
         context = {'form': form}
         data['html_form'] = render_to_string('../templates/mainSection/partials/editproduct.html', context, request=request)
@@ -419,7 +413,7 @@ def closeshipment(request):
             # clearing the session form the system. so the New id will be facilitated
             request.session['shipmentID'] = None
             request.session.modified = True
-            messages.success(request, messages.INFO, "Shipment " + objShipment.shipmentNumber +  " Closed")
+            messages.success(request, "Shipment " + objShipment.shipmentNumber +  " Closed")
 
     return redirect('mainSection:reviewshipment')
 

@@ -24,7 +24,7 @@
                             {% for message in messages %}
                                 <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible"{% endif %}>
                                     <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+
                                     <p>{{ message }}</p>
                                 </div>
                                 </div>
