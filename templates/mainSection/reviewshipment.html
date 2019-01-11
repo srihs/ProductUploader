@@ -23,7 +23,7 @@
                         <div style="margin-left:auto; margin-right:auto;">
                             {% for message in messages %}
                                 <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible"{% endif %}>
-                                    <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <a href="" style="text-decoration:none" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 
                                     <p>{{ message }}</p>
                                 </div>
