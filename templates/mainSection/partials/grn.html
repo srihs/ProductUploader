@@ -1,10 +1,10 @@
-<form id='frmCreateShipmentDetails' action="{% url 'mainSection:updateproduct' form.instance.pk %}"
+<form id='frmGrnShipmentDetails' action="{% url 'mainSection:updateproductgrn' form.instance.pk %}"
       method="POST">
     {% csrf_token %}
     <div class="col-md-12 center">
         <div class="row">
             <div class="col-md-6 mb-4">
-                {{ form.sellingPrice }}
+                {{ form.receivedQty }}
             </div>
 
         </div>

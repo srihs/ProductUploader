@@ -33,12 +33,7 @@ class CreateProductForm(forms.ModelForm):
 
     weight = forms.DecimalField(max_digits=10, widget=forms.NumberInput(
         attrs={'class': 'form-control', 'id': 'weight',
-               'required': 'true', 'placeholder': 'Weight in gms'}
-    ))
-
-    sellingPrice = forms.DecimalField(max_digits=10, widget=forms.NumberInput(
-        attrs={'class': 'form-control', 'id': 'sellingPrice',
-               'required': 'true', 'placeholder': 'Selling Price'}
+               'required': 'true', 'placeholder': 'Weight in gms','min':1}
     ))
 
     img = forms.ImageField(widget=forms.FileInput(
@@ -60,36 +55,33 @@ class CreateProductForm(forms.ModelForm):
 class CreateShipmentDetails(forms.ModelForm):
     indPrice = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.NumberInput(
         attrs={'class': 'form-control', 'id': 'indPrice',
-               'required': 'true', 'placeholder': 'Ind. Price'}
+               'required': 'true', 'placeholder': 'Ind. Price','min':1}
     ))
 
     qty = forms.DecimalField(max_digits=10, required=True, widget=forms.NumberInput(
         attrs={'class': 'form-control', 'id': 'qty',
-               'required': 'true', 'placeholder': 'Qty'}
+               'required': 'true', 'placeholder': 'Qty','min':1}
     ))
 
     billNumber = forms.IntegerField(widget=forms.NumberInput(
         attrs={'class': 'form-control', 'id': 'billNumber',
-               'placeholder': 'Bill Number'}
+               'placeholder': 'Bill Number', 'min':1}
     ))
 
     billDate = forms.DateField(required=True, widget=forms.DateInput(
         attrs={'class': 'form-control','style': 'text-align: center;', 'id': 'datepicker2','placeholder': 'Bill Date'}))
 
-    sellingPrice = forms.DecimalField(max_digits=10, widget=forms.NumberInput(
-        attrs={'class': 'form-control', 'id': 'sellingPrice',
-               'required': 'true', 'placeholder': 'Selling Price'}
-    ))
+
 
     class Meta:
         model = ShipmentDetail
-        fields = ['indPrice', 'qty' , 'billDate','billNumber', 'sellingPrice']
+        fields = ['indPrice', 'qty' , 'billDate','billNumber', 'sellingPrice', 'receivedQty']
 
 
 class CreateCostFactorForm(forms.ModelForm):
     costBase = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.NumberInput(
         attrs={'class': 'form-control', 'id': 'costBase',
-               'required': 'true'}
+               'required': 'true', 'min':1}
     ))
 
     costFile = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control', 'id': 'costFile',
@@ -99,6 +91,25 @@ class CreateCostFactorForm(forms.ModelForm):
     class Meta:
         model = Shipment
         fields = ['costBase', 'costFile']
+
+
+class sellingPriceForm(forms.ModelForm):
+    sellingPrice = forms.DecimalField(max_digits=10, widget=forms.NumberInput(
+        attrs={'class': 'form-control', 'id': 'sellingPrice',
+               'required': 'true', 'placeholder': 'Selling Price', 'min': 1}
+    ))
+    class Meta:
+        model = ShipmentDetail
+        fields = ['sellingPrice']
+
+class GRNForm(forms.ModelForm):
+    receivedQty = forms.IntegerField(widget=forms.NumberInput(
+        attrs={'class': 'form-control', 'id': 'receivedQty',
+               'required': 'true', 'placeholder': 'Received Qty', 'min': 1}
+    ))
+    class Meta:
+        model = ShipmentDetail
+        fields = ['receivedQty']
 
 
     

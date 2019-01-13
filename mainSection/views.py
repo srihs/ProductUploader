@@ -5,11 +5,10 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from decimal import *
-import math
 
 
 from .decorators import office_required
-from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm
+from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm, sellingPriceForm, GRNForm
 from .models import Shipment, ProductTypes, ShipmentDetail, Country, Products
 
 # global variables
@@ -35,6 +34,7 @@ def getShipmentItemsList(shipmentId):
             'product__types')
     return shipmentItem_list
 
+
 @login_required
 def home(request):
     # clearing the session form the system. so the New id will be facilitated
@@ -49,6 +49,8 @@ def createshipment(request):
         # clearing the session form the system. so the New id will be facilitated
         request.session['shipmentID'] = None
         request.session.modified = True
+        shipmentPointList = Country.objects.all()
+        productCode = request.user.productCode
 
         # shipmentNumber is defined by 'SHN-000' + next Id in the shipment Table
         try:
@@ -58,7 +60,7 @@ def createshipment(request):
         except:
             # if the next ID is null define the record as the first
             nextId = 1
-        shipmentPointList = Country.objects.all()
+
         # creating the form with the shipment ID
         form = CreateShipmentForm(
             initial={'shipmentNumber': 'SHN-000' + str(nextId)})
@@ -130,31 +132,15 @@ def viewshipment(request):
 @login_required
 @office_required
 def reviewShipment(request):
-    shipment_list = Shipment.objects.filter(isClosed='False', isFinalized='1', isCostbaseFinalized='1')
+    shipment_list = Shipment.objects.filter(isCostapplied='False', isFinalized='1', isCostbaseFinalized='1')
 
     if request.method == 'GET':
-        if request.method == 'GET' and request.session['shipmentID'] is not None:
-            shipmentID = request.session['shipmentID']
-            # Saving the selected Shipment object to passback to the template
-            # selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
-            selectedShipment = Shipment.objects.get(pk=shipmentID)
-
-            shipmentItem_list = getShipmentItemsList(shipmentID)
-            shipmentTotal = 0
-            shipmentTotalQty = 0
-            shippingWeight = 0
-
-            for shipment in shipmentItem_list:
-                shipmentTotal += shipment.totalAmount
-                shipmentTotalQty += shipment.qty
-                shippingWeight += shipment.weight * shipment.qty
-
-            shippingWeightKG = shippingWeight / 1000
-
-        else:
+        if request.method == 'GET' and request.session['shipmentID'] is None:
             request.session['shipmentID'] = None
             request.session.modified = True
-            return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
+
+        return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
+
 
     if request.method == 'POST':
         # if the request if for a shipment that is selected in the dropdown the the following code block will execute
@@ -184,41 +170,43 @@ def reviewShipment(request):
 # This method will handle the fillshipment request
 @login_required
 def fillshipment(request):
+    productCode = request.user.productCode
+    nextId =None
+
+    # shipmentNumber is defined by 'SHN-000' + next Id in the shipment Table
+    try:
+        # trying to retrive the next primaryKey
+        nextId =ShipmentDetail.objects.select_related(shipment__buyer=request.user).count()
+        nextId += 1
+    except:
+        # if the next ID is null define the record as the first
+        nextId = 1
     # initializing objects
-    productForm = CreateProductForm()
     shipmentDetailForm = CreateShipmentDetails()
+    productForm = CreateProductForm(
+        initial={'sku': productCode + '-000' + str(nextId)})  # creating the form with the product ID
 
-
-    # Retrieving The Product types for the ShipmentForm
-    productType_list = ProductTypes.objects.all()
-
-    # Retrieving The shipments which are open to fill. Only loged in users orders will be listed.
+    productType_list = ProductTypes.objects.all()     # Retrieving The Product types for the ShipmentForm
     shipment_list = Shipment.objects.filter(
-        isClosed='False', isFinalized='0', buyer=request.user)
+        isClosed='False', isFinalized='0', buyer=request.user)     # Retrieving The shipments which are open to fill. Only loged in users orders will be listed.
 
     # if the request if for a shipment that is selected in the dropdown the the following code block will execute
     if request.GET.get('shipmentDropDown'):
+        shipmentID = request.GET.get('shipmentDropDown')   # getting the shipmentID
+        shipmentItem_list = getShipmentItemsList(shipmentID)  # getting the shipment List
+        selectedShipment = get_object_or_404(Shipment, pk=shipmentID)         # Saving the selected Shipment object to passback to the template
+        request.session['shipmentID'] = selectedShipment.id         # stroing the shipment Id for the save operation
 
-        # getting the shipmentID
-        shipmentID = request.GET.get('shipmentDropDown')
-
-        # getting the shipment List
-        shipmentItem_list = getShipmentItemsList(shipmentID)
-
-        # Saving the selected Shipment object to passback to the template
-        selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
-
-        # stroing the shipment Id for the save operation
-        request.session['shipmentID'] = selectedShipment.id
 
     # This block will handel the requests with out shipping Id
+    # since the session.flush is voided due to the the authentication issue, ShipmentID is set to null in the
+    # session variable therefor need to check for null.
     elif request.method == 'GET' and request is not None and 'shipmentID' in request.session and request.session['shipmentID'] is not None:
         shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
-        # since the session.flush is voided due to the the authentication issue, ShipmentID is set to null in the
-        # session variable therefor need to check for null.
         selectedShipment = Shipment.objects.get(
             id=request.session['shipmentID'])
     else:
+        print('here')
         shipmentItem_list = None
         selectedShipment = None
 
@@ -230,8 +218,10 @@ def fillshipment(request):
 
 # This method will handle the save product request
 @login_required
+@transaction.atomic
 def saveproduct(request):
     if request.method == 'POST':
+        print('here in POST')
         form = CreateProductForm(request.POST, request.FILES)
         shipmentDetialForm = CreateShipmentDetails(request.POST)
 
@@ -239,32 +229,33 @@ def saveproduct(request):
         productType = get_object_or_404(
             ProductTypes, pk=request.POST['productType'])
 
-        # loading the ShipmentID
-        shipmentID = request.session['shipmentID']
+        shipmentID = request.session['shipmentID']   # loading the ShipmentID
+        print(shipmentID)
+        print(form.is_valid())
+        print(shipmentDetialForm.is_valid())
+        try:
+            if form.is_valid() and shipmentDetialForm.is_valid():
+                print(form.is_valid())
+                print(shipmentDetialForm.is_valid())
 
-        if form.is_valid() and shipmentDetialForm.is_valid():
-            productObj = form.save(commit=False)
+                productObj = form.save(commit=False)
+                productObj.types = productType # assigning the product Type
+                productObj.productImg = request.FILES['img']             # assigning the product image
+                productObj.save()
 
-            # assigning the product Type
-            productObj.types = productType
+                # creating the shipment detail Object
+                shipmentDetailObj = shipmentDetialForm.save(commit=False)
+                shipmentDetailObj.product = productObj
+                shipmentDetailObj.weight = productObj.weight
+                shipmentDetailObj.shipment = Shipment.objects.get(id=shipmentID)
+                shipmentDetailObj.save()
 
-            # assigning the product image
-            productObj.productImg = request.FILES['img']
+            else:
+                messages.error(request, form.errors)
+        except Exception as e:
+            raise e
 
-            # productObj.productImage=file
-            productObj.save()
-
-            # creating the shipment detail Object
-            shipmentDetailObj = shipmentDetialForm.save(commit=False)
-            shipmentDetailObj.product = productObj
-            shipmentDetailObj.weight = productObj.weight
-            shipmentDetailObj.shipment = Shipment.objects.get(id=shipmentID)
-            shipmentDetailObj.save()
-
-        else:
-            messages.error(request, form.errors)
-
-        return redirect('mainSection:fillshipment')
+    return redirect('mainSection:fillshipment')
 
 
 # This method will handle the delete shipmentdetail request
@@ -393,7 +384,7 @@ def updateproduct(request, pk):
 
     else:
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
-        form = CreateShipmentDetails(instance=objShipmentDetail)
+        form = sellingPriceForm(instance=objShipmentDetail)
         context = {'form': form}
         data['html_form'] = render_to_string('../templates/mainSection/partials/editproduct.html', context, request=request)
         return JsonResponse(data)
@@ -402,19 +393,19 @@ def updateproduct(request, pk):
 
 @login_required
 @office_required
-def closeshipment(request):
+def applyCost(request):
     if request.method == 'POST':
         shipmentItem_list = ShipmentDetail.objects.filter(shipment=request.session['shipmentID'], archived='0',is_checked='0')
         if shipmentItem_list.count() > 0 :
             messages.error(request, "There are " + str(shipmentItem_list.count()) + " item(s) that need to be review. Please make sure all the items are reviewed. ")
         else:
             objShipment = Shipment.objects.get(pk=request.session['shipmentID'])
-            objShipment.isClosed = True
+            objShipment.isCostapplied = True
             objShipment.save()
             # clearing the session form the system. so the New id will be facilitated
             request.session['shipmentID'] = None
             request.session.modified = True
-            messages.success(request, "Shipment " + objShipment.shipmentNumber +  " Closed")
+            messages.success(request, "Shipment " + objShipment.shipmentNumber +  " Closed.")
 
     return redirect('mainSection:reviewshipment')
 
@@ -437,10 +428,82 @@ def viewproduct(request):
 
     return render(request, '../templates/mainSection/viewitem.html', {'Product': objProduct, 'objShipping_list': objShipping_list})
 
+@login_required
+def grnstore(request):
+    shipment_list = Shipment.objects.filter(isCostapplied='1', isFinalized='1', isCostbaseFinalized='1')
+
+    if request.method == 'GET':
+        return render(request, '../templates/mainSection/reviewgoodrecived.html', {'shipments': shipment_list})
+
+    # if the request if for a shipment that is selected in the dropdown the the following code block will execute
+    if request.POST.get('shipmentDropDown'):
+        shipmentID = request.POST.get('shipmentDropDown')
+        request.session['shipmentID'] = shipmentID
+        # Saving the selected Shipment object to passback to the template
+        selectedShipment = Shipment.objects.get(pk=shipmentID)
+        shipmentItem_list = getShipmentItemsList(shipmentID)
+        shipmentTotal = 0
+        shipmentTotalQty = 0
+        shippingWeight = 0
+
+        for shipment in shipmentItem_list:
+            shipmentTotal += shipment.totalAmount
+            shipmentTotalQty += shipment.qty
+            shippingWeight += shipment.weight * shipment.qty
+
+        shippingWeightKG = shippingWeight / 1000
+
+
+    return render(request, '../templates/mainSection/reviewgoodrecived.html',
+              {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal,
+               'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment,
+               'shippingWeightKG': shippingWeightKG})
+
+@login_required
+def updateproductgrn(request, pk):
+    data = dict()
+
+    if request.method == 'POST':
+        objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
+
+
+        if objShipmentDetail is not None:
+            objShipmentDetail.receivedQty = request.POST['receivedQty']
+            objShipmentDetail.is_grn = True
+            if int(objShipmentDetail.receivedQty) < int(objShipmentDetail.qty):
+                objShipmentDetail.is_completeReceive = False
+                messages.warning(request, "Item Received qty is less than the shipped Qty. If this is a mistake you can edit again and correct it.")
+            else:
+                objShipmentDetail.is_completeReceive = True
+            objShipmentDetail.save()
 
 
 
+    else:
+        objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
+        form = GRNForm(instance=objShipmentDetail)
+        context = {'form': form}
+        data['html_form'] = render_to_string('../templates/mainSection/partials/grn.html', context,
+                                             request=request)
+        return JsonResponse(data)
+
+    return redirect('mainSection:grnstore')
 
 
+@login_required
+def closeshipment(request):
+    if request.method == 'POST':
+        shipmentItem_list = ShipmentDetail.objects.filter(shipment=request.session['shipmentID'], archived='0',is_grn='0')
+        if shipmentItem_list.count() > 0 :
+            messages.error(request, "There are " + str(shipmentItem_list.count()) + " item(s) that need to be GRN. Please make sure all the items are reviewed.")
+        else:
+            objShipment = Shipment.objects.get(pk=request.session['shipmentID'])
+            objShipment.isClosed = True
+            objShipment.save()
+            # clearing the session form the system. so the New id will be facilitated
+            request.session['shipmentID'] = None
+            request.session.modified = True
+            messages.success(request, "Shipment " + objShipment.shipmentNumber +  " Closed.")
 
+    return redirect('mainSection:grnstore')
 

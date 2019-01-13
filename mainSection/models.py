@@ -10,6 +10,7 @@ class User(AbstractUser):
     is_buyer = models.BooleanField(default=False)
     is_officeUser = models.BooleanField(default=False)
     is_storeUser = models.BooleanField(default=False)
+    productCode  = models.CharField(max_length=50)
 
 
 class Country(models.Model):
@@ -29,6 +30,7 @@ class Shipment(models.Model):
     shipmentDate = models.DateField()
     isClosed = models.BooleanField(default='False')
     isFinalized = models.BooleanField(default='False')
+    isCostapplied = models.BooleanField(default='False')
     isCostbaseFinalized = models.BooleanField(default='False')
     costBase = models.DecimalField(
         decimal_places=2, max_digits=10, null=True, blank=True)
@@ -83,6 +85,7 @@ class ShipmentDetail(models.Model):
     indPrice = models.DecimalField(
         decimal_places=2, max_digits=10, null=True, blank=True)
     qty = models.PositiveIntegerField(null=True, blank=True)
+    receivedQty = models.PositiveIntegerField(null=True, blank=True, default=0)
     weight = models.PositiveIntegerField()
     totalAmount = models.PositiveIntegerField(null=True, blank=True)
     costBase = models.DecimalField(
@@ -97,7 +100,9 @@ class ShipmentDetail(models.Model):
         decimal_places=2, max_digits=10, null=True, blank=True)
     billDate = models.DateField(default=timezone.now)
     billNumber = models.PositiveIntegerField(null=True, blank=True)
-    is_checked = models.BooleanField(default='False')
+    is_checked = models.BooleanField(default='False') # occured when the shipment item is checked and selling price set
+    is_completeReceive = models.BooleanField(default='False') # if the qty= receivedQty this will be true
+    is_grn = models.BooleanField(default='False') # checked from the stores
     archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
     dateModified = models.DateTimeField(default=timezone.now)

@@ -18,8 +18,11 @@ urlpatterns = [
     path('deleteshipmentdetail/<int:pk>', views.deleteshipmentdetail, name="deleteshipmentdetail"),
     path('finalizeshipment/', views.finalizeshipment, name="finalizeshipment"),
     path('updateproduct/<int:pk>/', views.updateproduct, name="updateproduct"),
-    path('closeshipment/', views.closeshipment, name="closeshipment"),
+    path('applyCost/', views.applyCost, name="applyCost"),
     path('viewproduct/', views.viewproduct, name="viewproduct"),
+    path('grn/', views.grnstore, name="grnstore"),
+    path('grn/<int:pk>/', views.updateproductgrn, name="updateproductgrn"),
+    path('closeshipment', views.closeshipment, name="closeshipment"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
