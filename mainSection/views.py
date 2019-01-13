@@ -5,6 +5,8 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from decimal import *
+from django.db.models import Count
+from django.db.models import F
 
 
 from .decorators import office_required
@@ -37,8 +39,15 @@ def getShipmentItemsList(shipmentId):
 
 @login_required
 def home(request):
-    # clearing the session form the system. so the New id will be facilitated
-    return render(request, '../templates/mainSection/home.html')
+    order_count = Shipment.objects.filter(buyer=request.user).count()
+    products_count = ShipmentDetail.objects.filter(shipment__buyer= request.user).count()
+    order_list = ShipmentDetail.objects.filter(shipment__buyer= request.user)#.annotate(total= Sum(F('indPrice') * F('qty')))['total'] or 0
+    total_value =0
+    for orderitem in order_list:
+        total_value += (orderitem.indPrice * orderitem.qty)
+    # no_bills = ShipmentDetail.objects.values('billNumber').distinct().count()
+    no_bills = ShipmentDetail.objects.filter(shipment__buyer= request.user).values('billNumber').distinct().count()
+    return render(request, '../templates/mainSection/home.html', {'order_count': order_count, 'products_count': products_count, 'total_value': total_value, 'no_bills': no_bills})
 
 
 # This method will handle the create shipment request
@@ -50,21 +59,15 @@ def createshipment(request):
         request.session['shipmentID'] = None
         request.session.modified = True
         shipmentPointList = Country.objects.all()
-        productCode = request.user.productCode
 
         # shipmentNumber is defined by 'SHN-000' + next Id in the shipment Table
         try:
-            # trying to retrive the next primaryKey
-            nextId = Shipment.objects.all().count()
+            nextId = Shipment.objects.all().count()   # trying to retrive the next primaryKey
             nextId += 1
         except:
-            # if the next ID is null define the record as the first
-            nextId = 1
-
-        # creating the form with the shipment ID
+            nextId = 1   # if the next ID is null define the record as the first
         form = CreateShipmentForm(
-            initial={'shipmentNumber': 'SHN-000' + str(nextId)})
-
+            initial={'shipmentNumber': 'SHN-000' + str(nextId)})  # creating the form with the shipment ID
     return render(request, '../templates/mainSection/createshipment.html', {'form': form, 'user': request.user, 'shipmentPointList': shipmentPointList})
 
 
@@ -104,10 +107,8 @@ def viewshipment(request):
 
             # getting the shipmentID
             shipmentID = request.POST.get('shipmentDropDown')
-            # Saving the selected Shipment object to passback to the template
-            selectedShipment = Shipment.objects.select_related('shippingPoint').select_related('buyer').get(id=shipmentID)
-
-
+            selectedShipment = Shipment.objects.select_related('shippingPoint').\
+                select_related('buyer').get(id=shipmentID)  # Saving the selected Shipment object to passback to the template
 
             # getting the shipment List
             shipmentItem_list = getShipmentItemsList(shipmentID)
@@ -141,7 +142,6 @@ def reviewShipment(request):
 
         return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
 
-
     if request.method == 'POST':
         # if the request if for a shipment that is selected in the dropdown the the following code block will execute
         if request.POST.get('shipmentDropDown'):
@@ -173,14 +173,13 @@ def fillshipment(request):
     productCode = request.user.productCode
     nextId =None
 
-    # shipmentNumber is defined by 'SHN-000' + next Id in the shipment Table
+    # shipmentNumber is defined by 'NuyerCode-000' + next Id in the shipment Table
     try:
-        # trying to retrive the next primaryKey
-        nextId =ShipmentDetail.objects.select_related(shipment__buyer=request.user).count()
+        nextId = ShipmentDetail.objects.filter(shipment__buyer= request.user).count() # trying to retrive the next primaryKey
         nextId += 1
     except:
-        # if the next ID is null define the record as the first
-        nextId = 1
+        nextId = 1     # if the next ID is null define the record as the first
+
     # initializing objects
     shipmentDetailForm = CreateShipmentDetails()
     productForm = CreateProductForm(
@@ -197,8 +196,6 @@ def fillshipment(request):
         selectedShipment = get_object_or_404(Shipment, pk=shipmentID)         # Saving the selected Shipment object to passback to the template
         request.session['shipmentID'] = selectedShipment.id         # stroing the shipment Id for the save operation
 
-
-    # This block will handel the requests with out shipping Id
     # since the session.flush is voided due to the the authentication issue, ShipmentID is set to null in the
     # session variable therefor need to check for null.
     elif request.method == 'GET' and request is not None and 'shipmentID' in request.session and request.session['shipmentID'] is not None:
@@ -225,19 +222,13 @@ def saveproduct(request):
         form = CreateProductForm(request.POST, request.FILES)
         shipmentDetialForm = CreateShipmentDetails(request.POST)
 
-        # loading the product type that was assigned to the product
         productType = get_object_or_404(
-            ProductTypes, pk=request.POST['productType'])
+            ProductTypes, pk=request.POST['productType']) # loading the product type that was assigned to the product
 
         shipmentID = request.session['shipmentID']   # loading the ShipmentID
-        print(shipmentID)
-        print(form.is_valid())
-        print(shipmentDetialForm.is_valid())
+
         try:
             if form.is_valid() and shipmentDetialForm.is_valid():
-                print(form.is_valid())
-                print(shipmentDetialForm.is_valid())
-
                 productObj = form.save(commit=False)
                 productObj.types = productType # assigning the product Type
                 productObj.productImg = request.FILES['img']             # assigning the product image
@@ -263,8 +254,7 @@ def saveproduct(request):
 def deleteshipmentdetail(request, pk):
     objShipmentDetail = get_object_or_404(ShipmentDetail, pk=pk)
     if request.method == 'GET':
-        # we are setting a parameter to mark the item as deleted.
-        objShipmentDetail.archived = True
+        objShipmentDetail.archived = True  # we are setting a parameter to mark the item as deleted.
         objShipmentDetail.save()
     return redirect('mainSection:fillshipment')
 
@@ -295,8 +285,6 @@ def finalizeshipment(request):
 @transaction.atomic
 def generateCostFactor(request):
     # clearing the session form the system. so the New id will be facilitated
-
-
     shipment_list = None
     shipment_list = Shipment.objects.filter(isClosed='0', isFinalized='1', isCostbaseFinalized='False')
     form = CreateCostFactorForm()
@@ -309,10 +297,7 @@ def generateCostFactor(request):
                 # getting the shipmentID
                 shipmentID = request.POST.get('shipmentDropDown')
                 request.session['shipmentID'] = shipmentID
-                # Saving the selected Shipment object to passback to the template
-                #selectedShipment = get_object_or_404(Shipment, pk=shipmentID)
-                selectedShipment = Shipment.objects.get(pk=shipmentID)
-
+                selectedShipment = Shipment.objects.get(pk=shipmentID) # Saving the selected Shipment object to passback to the template
                 shipmentItem_list = getShipmentItemsList(shipmentID)
                 shipmentTotal = 0
                 shipmentTotalQty = 0
@@ -343,9 +328,9 @@ def generateCostFactor(request):
 
                     objShipment.save()
                     form = CreateCostFactorForm()  # Added this to clear the previous values for fields
+                    messages.success(request, "Cost base updated for the Shipment. Please verify the Shipment.")
                     return render(request, '../templates/mainSection/costfactor.html',
                                   {'form': form, 'shipments': shipment_list})
-                    messages.success(request, "Cost base updated for the Shipment. Please verify the Shipment.")
                     # clearing the session form the system. so the New id will be facilitated
                     request.session['shipmentID'] = None
                     request.session.modified = True
@@ -354,7 +339,6 @@ def generateCostFactor(request):
                         messages.error(request, "Something went wrong.")
 
                 # clearing the session form the system. so the New id will be facilitated
-
 
     return render(request, '../templates/mainSection/costfactor.html',
                   {'form': form, 'shipments': shipment_list,'shipmentTotal': shipmentTotal,
@@ -453,7 +437,6 @@ def grnstore(request):
 
         shippingWeightKG = shippingWeight / 1000
 
-
     return render(request, '../templates/mainSection/reviewgoodrecived.html',
               {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal,
                'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment,
@@ -465,8 +448,6 @@ def updateproductgrn(request, pk):
 
     if request.method == 'POST':
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
-
-
         if objShipmentDetail is not None:
             objShipmentDetail.receivedQty = request.POST['receivedQty']
             objShipmentDetail.is_grn = True
@@ -476,9 +457,6 @@ def updateproductgrn(request, pk):
             else:
                 objShipmentDetail.is_completeReceive = True
             objShipmentDetail.save()
-
-
-
     else:
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
         form = GRNForm(instance=objShipmentDetail)
