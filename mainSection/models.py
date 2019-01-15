@@ -35,7 +35,7 @@ class Shipment(models.Model):
     costBase = models.DecimalField(
         decimal_places=2, max_digits=10, null=True, blank=True)
     costFile = models.FileField(
-        upload_to=settings.MEDIA_ROOT + '/Costing/%Y/%m/%d/', null=True, blank=True, max_length=5000)
+        upload_to=settings.MEDIA_ROOT + 'Costing/%Y/%m/%d/', null=True, blank=True, max_length=5000)
     shippingPoint = models.ForeignKey(Country, on_delete=models.CASCADE)
     buyer = models.ForeignKey(User, on_delete=models.CASCADE)
     dateCreated = models.DateTimeField(default=timezone.now)
@@ -65,7 +65,7 @@ class Products(models.Model):
     sellingPrice = models.DecimalField(
         decimal_places=2, max_digits=10, null=True, blank=True)
     productImg = models.ImageField(
-        upload_to=settings.MEDIA_ROOT + '/%Y/%m/%d/', null=True, blank=True, max_length=5000)
+        upload_to=settings.MEDIA_ROOT + '%Y/%m/%d/', null=True, blank=True, max_length=5000)
     types = models.ForeignKey(ProductTypes, on_delete=models.CASCADE)
     archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
