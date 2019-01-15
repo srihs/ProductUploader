@@ -82,8 +82,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'productUploader',
         'USER': 'root',
-        'PASSWORD': 'Im@liem123#',
-        #'PASSWORD': 'KaV*sjs6IiE7', Production Pass
+        #'PASSWORD': 'Im@liem123#',
+        'PASSWORD': 'KaV*sjs6IiE7', #Production Pass
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
@@ -132,10 +132,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
-STATIC_URL = '/static/'
+#STATIC_URL = '/static/' #dev
+STATIC_URL ='/home/srimal/prod_upload/productUploader/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+#MEDIA_URL = '/media/' #dev
+MEDIA_URL = '/home/srimal/prod_upload/productUploader/media/'
 
 MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.INFO: 'info',
