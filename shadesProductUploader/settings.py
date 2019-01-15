@@ -132,11 +132,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
-STATIC_URL = '/static/' #dev
+STATIC_URL = 'static/' #dev
 #STATIC_URL ='/home/srimal/prod_upload/productUploader/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/' #dev
+MEDIA_URL = 'media/' #dev
 #MEDIA_URL = '/home/srimal/prod_upload/productUploader/media/'
 
 MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
