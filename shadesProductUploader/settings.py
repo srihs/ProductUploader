@@ -134,9 +134,8 @@ STATICFILES_DIRS = (
 )
 STATIC_URL = '/static/'
 
-
-MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.INFO: 'info',
