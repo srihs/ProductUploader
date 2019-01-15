@@ -147,7 +147,8 @@
                                 Shipment Cost Factor</a></li>
                             <li><a href="{% url 'mainSection:reviewshipment' %}"><i class="fa fa-barcode"></i> Review
                                 Shipment</a></li>
-                            <li><a href="{% url 'mainSection:viewproduct' %}"><i class="fa fa-search"></i> View Item</a></li>
+                            <li><a href="{% url 'mainSection:viewproduct' %}"><i class="fa fa-search"></i> View Item</a>
+                            </li>
 
                         </ul>
                     </li>
@@ -162,6 +163,20 @@
                         <ul class="treeview-menu">
                             <li><a href="{% url 'mainSection:grnstore' %}"><i class="fas fa-sign-in-alt"></i> Confirm
                                 Shipment</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fas fa-university"></i>
+                            <span>Reports</span>
+                            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="{% url 'mainSection:costfactor' %}"><i class="fas fa-hand-holding-usd"></i>
+                                Shipment Summary</a></li>
                         </ul>
                     </li>
                 {% else %}
@@ -212,7 +227,8 @@
     <!-- /.content-wrapper -->
     <footer class="main-footer">
         <div class="pull-right hidden-xs">
-           <p style="text-align:center"> <b>Version</b> 1.0.0  <br/>         <strong>Copyright &copy; 2018. Srimal Samarasooriya. All
+            <p style="text-align:center"><b>Version</b> 1.0.0 <br/> <strong>Copyright &copy; 2018. Srimal Samarasooriya.
+                All
                 rights reserved. <a href="https://adminlte.io"> Theme by adminlte</a>.</strong></p>
 
         </div>
