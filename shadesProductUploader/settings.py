@@ -16,6 +16,7 @@ from django.contrib.messages import constants as message_constants
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -25,7 +26,8 @@ SECRET_KEY = 'w_8n-+te5g*b^!m+0^-jdk)nm^vw95an%gvjhg!fv6cb%lw_tk'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
+
 
 # Application definition
 
@@ -56,7 +58,7 @@ ROOT_URLCONF = 'shadesProductUploader.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [(os.path.join(BASE_DIR, 'templates')), ],
+        'DIRS': [(os.path.join(BASE_DIR, 'templates')),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -71,20 +73,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'shadesProductUploader.wsgi.application'
 
+
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'productUploader',
         'USER': 'root',
-        # 'PASSWORD': 'Im@liem123#',
-        'PASSWORD': 'KaV*sjs6IiE7',  # Production Pass
-        'HOST': 'localhost',  # Or an IP Address that your DB is hosted on
+        'PASSWORD': 'Im@liem123#',
+        #'PASSWORD': 'KaV*sjs6IiE7', Production Pass
+        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -104,6 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
@@ -117,25 +122,28 @@ USE_L10N = True
 
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATIC_URL = 'static/'  # dev
-# STATIC_URL ='/home/srimal/prod_upload/productUploader/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
+STATIC_URL = '/static/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
-MEDIA_URL = '/media/'  # dev
-# MEDIA_URL = '/home/srimal/prod_upload/productUploader/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.INFO: 'info',
                 message_constants.SUCCESS: 'success',
                 message_constants.WARNING: 'warning',
-                message_constants.ERROR: 'danger', }
+                message_constants.ERROR: 'danger',}
+
+
 
 LOGIN_URL = 'authSection:login'
 
@@ -143,4 +151,4 @@ LOGOUT_URL = 'logout'
 
 LOGOUT_REDIRECT_URL = 'home'
 
-AUTH_USER_MODEL = 'mainSection.User'
+AUTH_USER_MODEL ='mainSection.User'
