@@ -50,7 +50,7 @@
                     <div class="box-body">
                         <div class="col-md-4 center">
                             <form id="frmsearchShipment" action="{% url 'mainSection:reviewshipment' %}"
-                                  method="POST">
+                                  method="GET">
                                 {% csrf_token %}
                                 <div class="im-centered row">
                                     <div class="col-md-8 mb-6">
