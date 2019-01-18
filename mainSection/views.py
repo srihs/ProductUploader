@@ -133,13 +133,18 @@ def viewshipment(request):
 @login_required
 @office_required
 def reviewShipment(request):
+    shipmentTotal = 0
+    shipmentTotalQty = 0
+    selectedShipment = 0
+    shippingWeight = 0
+    shippingWeightKG = 0
 
     shipment_list = Shipment.objects.filter(isCostapplied='False', isFinalized='1', isCostbaseFinalized='1')
 
     if request.method == 'GET':
         # if the request if for a shipment that is selected in the dropdown the the following code block will execute
         if request.GET.get('shipmentDropDown'):
-            print(request.GET.get('shipmentDropDown'))
+
             shipmentID = request.GET.get('shipmentDropDown')  # getting the shipmentID
             shipmentItem_list = getShipmentItemsList(shipmentID)  # getting the shipment List
             selectedShipment = get_object_or_404(Shipment,
@@ -153,8 +158,15 @@ def reviewShipment(request):
             shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
             selectedShipment = Shipment.objects.get(
                 id=request.session['shipmentID'])
+
+            for shipment in shipmentItem_list:
+                shipmentTotal += shipment.totalAmount
+                shipmentTotalQty += shipment.qty
+                shippingWeight += shipment.weight * shipment.qty
+
+            shippingWeightKG = shippingWeight / 1000
         else:
-            print('here')
+
             shipmentItem_list = None
             selectedShipment = None
 
@@ -162,8 +174,6 @@ def reviewShipment(request):
                       {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal,
                        'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment,
                        'shippingWeightKG': shippingWeightKG})
-    else:
-        return render(request, '../templates/mainSection/reviewshipment.html', {'shipments': shipment_list})
 
     if request.method == 'POST':
         # if the request if for a shipment that is selected in the dropdown the the following code block will execute
@@ -174,7 +184,7 @@ def reviewShipment(request):
             # Saving the selected Shipment object to passback to the template
             selectedShipment = Shipment.objects.get(pk=shipmentID)
             shipmentItem_list = getShipmentItemsList(shipmentID)
-            print(shipmentItem_list)
+
             shipmentTotal = 0
             shipmentTotalQty = 0
             shippingWeight = 0
@@ -234,7 +244,7 @@ def fillshipment(request):
         selectedShipment = Shipment.objects.get(
             id=request.session['shipmentID'])
     else:
-        print('here')
+
         shipmentItem_list = None
         selectedShipment = None
 
@@ -249,7 +259,7 @@ def fillshipment(request):
 @transaction.atomic
 def saveproduct(request):
     if request.method == 'POST':
-        print('here in POST')
+
         form = CreateProductForm(request.POST, request.FILES)
         shipmentDetialForm = CreateShipmentDetails(request.POST)
 
@@ -445,10 +455,41 @@ def viewproduct(request):
 
 @login_required
 def grnstore(request):
-    shipment_list = Shipment.objects.filter(isCostapplied='1', isFinalized='1', isCostbaseFinalized='1')
+    shipmentTotal = 0
+    shipmentTotalQty = 0
+    selectedShipment = 0
+    shippingWeight = 0
+    shippingWeightKG = 0
+    shipmentItem_list = None
+    shipment_list = Shipment.objects.filter(isCostapplied='1', isFinalized='1', isCostbaseFinalized='1', isClosed='0')
 
     if request.method == 'GET':
-        return render(request, '../templates/mainSection/reviewgoodrecived.html', {'shipments': shipment_list})
+        # since the session.flush is voided due to the the authentication issue, ShipmentID is set to null in the
+        # session variable therefor need to check for null.
+        if request.method == 'GET' and request is not None and 'shipmentID' in request.session and request.session['shipmentID'] is not None:
+            shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
+            selectedShipment = Shipment.objects.get(
+            id=request.session['shipmentID'])
+
+            for shipment in shipmentItem_list:
+                shipmentTotal += shipment.totalAmount
+                shipmentTotalQty += shipment.qty
+                shippingWeight += shipment.weight * shipment.qty
+
+            shippingWeightKG = shippingWeight / 1000
+
+            for shipment in shipmentItem_list:
+                shipmentTotal += shipment.totalAmount
+                shipmentTotalQty += shipment.qty
+                shippingWeight += shipment.weight * shipment.qty
+
+            shippingWeightKG = shippingWeight / 1000
+
+            return render(request, '../templates/mainSection/reviewgoodrecived.html',
+                          {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list,
+                           'shipmentTotal': shipmentTotal,
+                           'shipmentTotalQty': shipmentTotalQty, 'selectedShipment': selectedShipment,
+                           'shippingWeightKG': shippingWeightKG})
 
     # if the request if for a shipment that is selected in the dropdown the the following code block will execute
     if request.POST.get('shipmentDropDown'):
@@ -488,6 +529,7 @@ def updateproductgrn(request, pk):
             else:
                 objShipmentDetail.is_completeReceive = True
             objShipmentDetail.save()
+
     else:
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
         form = GRNForm(instance=objShipmentDetail)

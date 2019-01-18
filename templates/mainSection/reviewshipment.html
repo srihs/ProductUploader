@@ -219,7 +219,7 @@
                                 <td>
                                     <p style="text-align:right"><img
                                             src="{{ shipmentdetail.product.productImg.url }}"
-                                            width="150px;"></p>
+                                            width="175px;"></p>
                                 </td>
                             {% else %}
                                 <td></td>
@@ -228,12 +228,6 @@
                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.weight }}</td>
                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.indPrice|intcomma }}</td>
                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.qty|intcomma }}</td>
-
-
-
-
-
-
                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">
                                 {{ shipmentdetail.cost|floatformat:2 }}</td>
                             <td style="text-align: right; max-width:100%; word-wrap:break-word;">
