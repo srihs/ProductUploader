@@ -143,8 +143,6 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.WARNING: 'warning',
                 message_constants.ERROR: 'danger',}
 
-
-
 LOGIN_URL = 'authSection:login'
 
 LOGOUT_URL = 'logout'
