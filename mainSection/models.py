@@ -38,9 +38,9 @@ class Shipment(models.Model):
         upload_to='Costing/%Y/%m/%d/', null=True, blank=True, max_length=5000)
     shippingPoint = models.ForeignKey(Country, on_delete=models.CASCADE)
     buyer = models.ForeignKey(User, on_delete=models.CASCADE)
-    dateCreated = models.DateTimeField(default=timezone.now)
+    dateCreated = models.DateTimeField(auto_now_add=True)
     userCreated = models.CharField(max_length=500)
-    dateModified = models.DateTimeField(default=timezone.now)
+    dateModified = models.DateTimeField(auto_now=True)
     userModified = models.CharField(max_length=500)
 
     @property
@@ -70,9 +70,9 @@ class Products(models.Model):
         upload_to='images/%Y/%m/%d/', null=True, blank=True, max_length=5000)
     types = models.ForeignKey(ProductTypes, on_delete=models.CASCADE)
     archived = models.BooleanField(default='False')
-    dateCreated = models.DateTimeField(default=timezone.now)
+    dateCreated = models.DateTimeField(auto_now_add=True)
     userCreated = models.CharField(max_length=500)
-    dateModified = models.DateTimeField(default=timezone.now)
+    dateModified = models.DateTimeField(auto_now=True)
     userModified = models.CharField(max_length=500)
 
     class Meta:
@@ -108,9 +108,9 @@ class ShipmentDetail(models.Model):
     is_completeReceive = models.BooleanField(default='False') # if the qty= receivedQty this will be true
     is_grn = models.BooleanField(default='False') # checked from the stores
     archived = models.BooleanField(default='False')
-    dateCreated = models.DateTimeField(default=timezone.now)
+    dateCreated = models.DateTimeField(auto_now_add=True)
     userCreated = models.CharField(max_length=500)
-    dateModified = models.DateTimeField(default=timezone.now)
+    dateModified = models.DateTimeField(auto_now=True)
     userModified = models.CharField(max_length=500)
 
     class Meta:

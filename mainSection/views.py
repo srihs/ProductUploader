@@ -299,7 +299,7 @@ def deleteshipmentdetail(request, pk):
     if request.method == 'GET':
         objShipmentDetail.archived = True  # we are setting a parameter to mark the item as deleted.
         objShipmentDetail.userModified = str(request.user.username)
-        objShipmentDetail.dateModified = timezone.now()
+
         objShipmentDetail.save()
     return redirect('mainSection:fillshipment')
 
@@ -316,7 +316,6 @@ def finalizeshipment(request):
         if shipmentItem_list.count() > 0:
             objShipment.isFinalized = True
             objShipment.userModified = str(request.user.username)
-            objShipment.dateModified = timezone.now()
             objShipment.save()
             # clearing the session form the system. so the New id will be facilitated
             request.session['shipmentID'] = None
@@ -367,13 +366,13 @@ def generateCostFactor(request):
                     # assigning the cost file
                     objShipment.costFile = form.cleaned_data['costFile']
                     objShipment.userModified = str(request.user.username)
-                    objShipment.dateModified = timezone.now()
+
                     shipmentItem_list = getShipmentItemsList(shipmnetID)
 
                     for shipmentItem in shipmentItem_list:
                         shipmentItem.costBase = objShipment.costBase
                         shipmentItem.userModified = str(request.user.username)
-                        shipmentItem.dateModified = timezone.now()
+
                         shipmentItem.save()
 
                     objShipment.save()
@@ -413,13 +412,13 @@ def updateproduct(request, pk):
             else:
                 objShipmentDetail.is_checked = True
                 objShipmentDetail.userModified = str(request.user.username)
-                objShipmentDetail.dateModified = timezone.now()
+
                 # productObj.productImage=file
                 objShipmentDetail.save()
                 objProject = Products.objects.get(pk=objShipmentDetail.product.id)
                 objProject.sellingPrice = request.POST['sellingPrice']
                 objProject.userModified = str(request.user.username)
-                objProject.dateModified = timezone.now()
+
                 objProject.save()
 
     else:
@@ -442,7 +441,7 @@ def applyCost(request):
             objShipment = Shipment.objects.get(pk=request.session['shipmentID'])
             objShipment.isCostapplied = True
             objShipment.userModified = str(request.user.username)
-            objShipment.dateModified = timezone.now()
+
             objShipment.save()
             # clearing the session form the system. so the New id will be facilitated
             request.session['shipmentID'] = None
@@ -545,7 +544,7 @@ def updateproductgrn(request, pk):
             objShipmentDetail.receivedQty = request.POST['receivedQty']
             objShipmentDetail.is_grn = True
             objShipmentDetail.userUpdated = str(request.user.username)
-            objShipmentDetail.dateModified = timezone.now()
+
 
             if int(objShipmentDetail.receivedQty) < int(objShipmentDetail.qty):
                 objShipmentDetail.is_completeReceive = False
@@ -580,7 +579,7 @@ def closeshipment(request):
             objShipment = Shipment.objects.get(pk=request.session['shipmentID'])
             objShipment.isClosed = True
             objShipment.userModified = str(request.user.username)
-            objShipment.dateModified = timezone.now()
+
             objShipment.save()
             # clearing the session form the system. so the New id will be facilitated
             request.session['shipmentID'] = None
