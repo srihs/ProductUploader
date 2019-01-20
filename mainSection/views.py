@@ -5,10 +5,7 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from decimal import *
-from django.db.models import Count
-from django.db.models import F
-
-
+from django.utils import timezone
 from .decorators import office_required
 from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm, sellingPriceForm, GRNForm
 from .models import Shipment, ProductTypes, ShipmentDetail, Country, Products
@@ -82,6 +79,7 @@ def saveshipment(request):
 
             objShipment.shippingPoint = objCountry
             objShipment.buyer = request.user
+            objShipment.userCreated = request.user
             objShipment.save()
         else:
             messages.error(request, form.errors)
@@ -144,7 +142,9 @@ def reviewShipment(request):
     if request.method == 'GET':
         # if the request if for a shipment that is selected in the dropdown the the following code block will execute
         if request.GET.get('shipmentDropDown'):
-
+            # clearing the session form the system. so the New id will be facilitated
+            request.session['shipmentID'] = None
+            request.session.modified = True
             shipmentID = request.GET.get('shipmentDropDown')  # getting the shipmentID
             shipmentItem_list = getShipmentItemsList(shipmentID)  # getting the shipment List
             selectedShipment = get_object_or_404(Shipment,
@@ -264,7 +264,7 @@ def saveproduct(request):
         shipmentDetialForm = CreateShipmentDetails(request.POST)
 
         productType = get_object_or_404(
-            ProductTypes, pk=request.POST['productType']) # loading the product type that was assigned to the product
+            ProductTypes, pk=request.POST['productType'])  # loading the product type that was assigned to the product
 
         shipmentID = request.session['shipmentID']   # loading the ShipmentID
 
@@ -272,7 +272,8 @@ def saveproduct(request):
             if form.is_valid() and shipmentDetialForm.is_valid():
                 productObj = form.save(commit=False)
                 productObj.types = productType # assigning the product Type
-                productObj.productImg = request.FILES['img']             # assigning the product image
+                productObj.productImg = request.FILES['img']  # assigning the product image
+                productObj.userCreated = request.user
                 productObj.save()
 
                 # creating the shipment detail Object
@@ -280,6 +281,7 @@ def saveproduct(request):
                 shipmentDetailObj.product = productObj
                 shipmentDetailObj.weight = productObj.weight
                 shipmentDetailObj.shipment = Shipment.objects.get(id=shipmentID)
+                shipmentDetailObj.userCreated = request.user
                 shipmentDetailObj.save()
 
             else:
@@ -296,6 +298,8 @@ def deleteshipmentdetail(request, pk):
     objShipmentDetail = get_object_or_404(ShipmentDetail, pk=pk)
     if request.method == 'GET':
         objShipmentDetail.archived = True  # we are setting a parameter to mark the item as deleted.
+        objShipmentDetail.userModified = str(request.user.username)
+        objShipmentDetail.dateModified = timezone.now()
         objShipmentDetail.save()
     return redirect('mainSection:fillshipment')
 
@@ -311,6 +315,8 @@ def finalizeshipment(request):
         shipmentItem_list = getShipmentItemsList(objShipment.id)
         if shipmentItem_list.count() > 0:
             objShipment.isFinalized = True
+            objShipment.userModified = str(request.user.username)
+            objShipment.dateModified = timezone.now()
             objShipment.save()
             # clearing the session form the system. so the New id will be facilitated
             request.session['shipmentID'] = None
@@ -325,7 +331,7 @@ def finalizeshipment(request):
 @login_required
 @transaction.atomic
 def generateCostFactor(request):
-    # clearing the session form the system. so the New id will be facilitated
+
     shipment_list = None
     shipment_list = Shipment.objects.filter(isClosed='0', isFinalized='1', isCostbaseFinalized='False')
     form = CreateCostFactorForm()
@@ -360,21 +366,26 @@ def generateCostFactor(request):
                     objShipment.costBase = form.cleaned_data['costBase']
                     # assigning the cost file
                     objShipment.costFile = form.cleaned_data['costFile']
-
+                    objShipment.userModified = str(request.user.username)
+                    objShipment.dateModified = timezone.now()
                     shipmentItem_list = getShipmentItemsList(shipmnetID)
 
                     for shipmentItem in shipmentItem_list:
                         shipmentItem.costBase = objShipment.costBase
+                        shipmentItem.userModified = str(request.user.username)
+                        shipmentItem.dateModified = timezone.now()
                         shipmentItem.save()
 
                     objShipment.save()
                     form = CreateCostFactorForm()  # Added this to clear the previous values for fields
                     messages.success(request, "Cost base updated for the Shipment. Please verify the Shipment.")
-                    return render(request, '../templates/mainSection/costfactor.html',
-                                  {'form': form, 'shipments': shipment_list})
                     # clearing the session form the system. so the New id will be facilitated
                     request.session['shipmentID'] = None
                     request.session.modified = True
+                    return render(request, '../templates/mainSection/costfactor.html',
+                                  {'form': form, 'shipments': shipment_list})
+
+
 
                 else:
                         messages.error(request, "Something went wrong.")
@@ -401,10 +412,14 @@ def updateproduct(request, pk):
                 messages.error(request, "Cost for the item is  Rs." + str(round(objShipmentDetail.cost,2)) +" . You have entered a price less than the cost.")
             else:
                 objShipmentDetail.is_checked = True
+                objShipmentDetail.userModified = str(request.user.username)
+                objShipmentDetail.dateModified = timezone.now()
                 # productObj.productImage=file
                 objShipmentDetail.save()
                 objProject = Products.objects.get(pk=objShipmentDetail.product.id)
                 objProject.sellingPrice = request.POST['sellingPrice']
+                objProject.userModified = str(request.user.username)
+                objProject.dateModified = timezone.now()
                 objProject.save()
 
     else:
@@ -426,6 +441,8 @@ def applyCost(request):
         else:
             objShipment = Shipment.objects.get(pk=request.session['shipmentID'])
             objShipment.isCostapplied = True
+            objShipment.userModified = str(request.user.username)
+            objShipment.dateModified = timezone.now()
             objShipment.save()
             # clearing the session form the system. so the New id will be facilitated
             request.session['shipmentID'] = None
@@ -438,6 +455,10 @@ def applyCost(request):
 def viewproduct(request):
     objProduct = None
     objShipping_list = None
+    # clearing the session form the system. so the New id will be facilitated
+    request.session['shipmentID'] = None
+    request.session.modified = True
+
     if request.method =='GET':
         return render(request, '../templates/mainSection/viewitem.html')
 
@@ -523,12 +544,20 @@ def updateproductgrn(request, pk):
         if objShipmentDetail is not None:
             objShipmentDetail.receivedQty = request.POST['receivedQty']
             objShipmentDetail.is_grn = True
+            objShipmentDetail.userUpdated = str(request.user.username)
+            objShipmentDetail.dateModified = timezone.now()
+
             if int(objShipmentDetail.receivedQty) < int(objShipmentDetail.qty):
                 objShipmentDetail.is_completeReceive = False
                 messages.warning(request, "Item Received qty is less than the shipped Qty. If this is a mistake you can edit again and correct it.")
-            else:
+
+            if int(objShipmentDetail.receivedQty) > int(objShipmentDetail.qty):
+                objShipmentDetail.is_completeReceive = False
+                messages.warning(request,"Item Received qty is greater than the shipped Qty. ")
                 objShipmentDetail.is_completeReceive = True
-            objShipmentDetail.save()
+            else:
+                 objShipmentDetail.save()
+
 
     else:
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
@@ -550,6 +579,8 @@ def closeshipment(request):
         else:
             objShipment = Shipment.objects.get(pk=request.session['shipmentID'])
             objShipment.isClosed = True
+            objShipment.userModified = str(request.user.username)
+            objShipment.dateModified = timezone.now()
             objShipment.save()
             # clearing the session form the system. so the New id will be facilitated
             request.session['shipmentID'] = None
