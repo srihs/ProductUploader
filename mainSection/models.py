@@ -39,7 +39,9 @@ class Shipment(models.Model):
     shippingPoint = models.ForeignKey(Country, on_delete=models.CASCADE)
     buyer = models.ForeignKey(User, on_delete=models.CASCADE)
     dateCreated = models.DateTimeField(default=timezone.now)
+    userCreated = models.CharField(max_length=500)
     dateModified = models.DateTimeField(default=timezone.now)
+    userModified = models.CharField(max_length=500)
 
     @property
     def __str__(self):
@@ -69,7 +71,9 @@ class Products(models.Model):
     types = models.ForeignKey(ProductTypes, on_delete=models.CASCADE)
     archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
+    userCreated = models.CharField(max_length=500)
     dateModified = models.DateTimeField(default=timezone.now)
+    userModified = models.CharField(max_length=500)
 
     class Meta:
         verbose_name_plural = "Products"
@@ -105,7 +109,9 @@ class ShipmentDetail(models.Model):
     is_grn = models.BooleanField(default='False') # checked from the stores
     archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(default=timezone.now)
+    userCreated = models.CharField(max_length=500)
     dateModified = models.DateTimeField(default=timezone.now)
+    userModified = models.CharField(max_length=500)
 
     class Meta:
         verbose_name_plural = "ShipmentDetails"
