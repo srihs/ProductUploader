@@ -12,8 +12,8 @@ import sys
 
 
 from django.core.wsgi import get_wsgi_application
-sys.path.append('/home/srimal/djangoProject/productUploader') # livesettings
-sys.path.append('/home/srimal/djangoProject/productUploader/shadesProductUploader') # livesettings
+#sys.path.append('/home/srimal/djangoProject/productUploader') # livesettings
+#sys.path.append('/home/srimal/djangoProject/productUploader/shadesProductUploader') # livesettings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shadesProductUploader.settings')
 
 application = get_wsgi_application()

@@ -155,20 +155,28 @@ def reviewShipment(request):
         # session variable therefor need to check for null.
         elif request.method == 'GET' and request is not None and 'shipmentID' in request.session and request.session[
             'shipmentID'] is not None:
+            print('here')
+
             shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
             selectedShipment = Shipment.objects.get(
                 id=request.session['shipmentID'])
 
-            for shipment in shipmentItem_list:
-                shipmentTotal += shipment.totalAmount
-                shipmentTotalQty += shipment.qty
-                shippingWeight += shipment.weight * shipment.qty
 
-            shippingWeightKG = shippingWeight / 1000
+
         else:
-
             shipmentItem_list = None
             selectedShipment = None
+
+        if(shipmentItem_list is not None):
+         for shipment in shipmentItem_list:
+            shipmentTotal += shipment.totalAmount
+            shipmentTotalQty += shipment.qty
+            shippingWeight += shipment.weight * shipment.qty
+
+        shippingWeightKG = shippingWeight / 1000
+        print(shipmentTotal)
+        print(shipmentTotalQty)
+        print(shippingWeight)
 
         return render(request, '../templates/mainSection/reviewshipment.html',
                       {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal,
@@ -545,19 +553,17 @@ def updateproductgrn(request, pk):
             objShipmentDetail.is_grn = True
             objShipmentDetail.userUpdated = str(request.user.username)
 
-
             if int(objShipmentDetail.receivedQty) < int(objShipmentDetail.qty):
                 objShipmentDetail.is_completeReceive = False
-                messages.warning(request, "Item Received qty is less than the shipped Qty. If this is a mistake you can edit again and correct it.")
+                messages.warning(request, "Item Received qty is less than the shipped Qty. "
+                                          "If this is a mistake you can edit again and correct it.")
 
             if int(objShipmentDetail.receivedQty) > int(objShipmentDetail.qty):
                 objShipmentDetail.is_completeReceive = False
                 messages.warning(request,"Item Received qty is greater than the shipped Qty. ")
                 objShipmentDetail.is_completeReceive = True
             else:
-                 objShipmentDetail.save()
-
-
+                objShipmentDetail.save()
     else:
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
         form = GRNForm(instance=objShipmentDetail)
