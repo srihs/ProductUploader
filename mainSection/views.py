@@ -561,8 +561,8 @@ def updateproductgrn(request, pk):
             if int(objShipmentDetail.receivedQty) > int(objShipmentDetail.qty):
                 objShipmentDetail.is_completeReceive = False
                 messages.warning(request,"Item Received qty is greater than the shipped Qty. ")
-                objShipmentDetail.is_completeReceive = True
             else:
+                objShipmentDetail.is_completeReceive = True
                 objShipmentDetail.save()
     else:
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
