@@ -8,7 +8,7 @@ from decimal import *
 from django.utils import timezone
 from .decorators import office_required
 from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm, sellingPriceForm, GRNForm
-from .models import Shipment, ProductTypes, ShipmentDetail, Country, Products
+from .models import Shipment, ProductTypes, ShipmentDetail, Country, Products, ProductSize, ProductColour
 
 # global variables
 shipment_list = None
@@ -235,6 +235,8 @@ def fillshipment(request):
         initial={'sku': productCode + '-000' + str(nextId)})  # creating the form with the product ID
 
     productType_list = ProductTypes.objects.all()     # Retrieving The Product types for the ShipmentForm
+    productsize_list = ProductSize.objects.all()  # Retreving all prouct Sizes
+    productColor_list = ProductColour.objects.all()  # Retreving all prouct Sizes
     shipment_list = Shipment.objects.filter(
         isClosed='False', isFinalized='0', buyer=request.user)     # Retrieving The shipments which are open to fill. Only loged in users orders will be listed.
 
@@ -257,7 +259,7 @@ def fillshipment(request):
         selectedShipment = None
 
     return render(request, '../templates/mainSection/fillshipment.html',
-                  {'selectedShipment': selectedShipment, 'productTypes': productType_list, 'shipments': shipment_list,
+                  {'selectedShipment': selectedShipment, 'productColours': productColor_list, 'productTypes': productType_list, 'productSizes': productsize_list, 'shipments': shipment_list,
                    'productForm': productForm, 'shipmentDetails': shipmentItem_list,
                    'ShipmentForm': shipmentDetailForm})
 
@@ -274,13 +276,21 @@ def saveproduct(request):
         productType = get_object_or_404(
             ProductTypes, pk=request.POST['productType'])  # loading the product type that was assigned to the product
 
+        productSize = get_object_or_404(
+            ProductSize, pk=request.POST['productSize'])
+
+        productColour = get_object_or_404(
+            ProductColour, pk=request.POST['productColour'])
+
         shipmentID = request.session['shipmentID']   # loading the ShipmentID
 
         try:
             if form.is_valid() and shipmentDetialForm.is_valid():
                 productObj = form.save(commit=False)
                 productObj.types = productType # assigning the product Type
-                productObj.productImg = request.FILES['img']  # assigning the product image
+                productObj.productImg = request.FILES['img']  # assigning the product image.
+                productObj.size= productSize
+                productObj.colour = productColour
                 productObj.userCreated = request.user
                 productObj.save()
 

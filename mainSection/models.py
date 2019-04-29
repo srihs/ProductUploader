@@ -59,16 +59,54 @@ class ProductTypes(models.Model):
         return self.productType
 
 
+class ProductColour(models.Model):
+    id = models.AutoField(primary_key=True)
+    productColour = models.CharField(max_length=100)
+    colourImg = models.ImageField(
+        upload_to='images/%Y/%m/%d/', null=True, blank=True, max_length=5000)
+
+    class Meta:
+        verbose_name_plural = "ProductColours"
+
+    def __str__(self):
+        return self.productColour
+
+
+class ProductSize(models.Model):
+    id = models.AutoField(primary_key=True)
+    productSize = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name_plural = "ProductSize"
+
+    def __str__(self):
+        return self.productSize
+
+
+class ProducBrands(models.Model):
+    id = models.AutoField(primary_key=True)
+    productBrand = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name_plural = "ProductBrand"
+
+    def __str__(self):
+        return self.productBrand
+
+
 class Products(models.Model):
     id = models.AutoField(primary_key=True)
     sku = models.CharField(max_length=100)
+    brand = models.ForeignKey(ProducBrands, on_delete=models.CASCADE, null=True, blank=True)
     vendor = models.CharField(max_length=500, blank=True)
     weight = models.PositiveIntegerField()
     sellingPrice = models.DecimalField(
         decimal_places=2, max_digits=10, null=True, blank=True)
     productImg = models.ImageField(
         upload_to='images/%Y/%m/%d/', null=True, blank=True, max_length=5000)
-    types = models.ForeignKey(ProductTypes, on_delete=models.CASCADE)
+    types = models.ForeignKey(ProductTypes, on_delete=models.CASCADE, null=True, blank=True)
+    colour = models.ForeignKey(ProductColour, on_delete=models.CASCADE, null=True, blank=True)
+    size = models.ForeignKey(ProductSize, on_delete=models.CASCADE, null=True, blank=True)
     archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(auto_now_add=True)
     userCreated = models.CharField(max_length=500)
@@ -77,6 +115,10 @@ class Products(models.Model):
 
     class Meta:
         verbose_name_plural = "Products"
+
+    @property
+    def productName(self):
+        return str(self.brand) + " " + str(self.types)
 
     def __str__(self):
         return self.sku

@@ -142,19 +142,51 @@
 
                                         <div class="col-md-2 mb-4">
 
-                                            <select name="productType" placeholder="Ind Price" class="form-control">
-                                                <option>-Select-</option>
+                                            <select name="productSize" placeholder="Price" class="form-control">
+                                                <option>-Select Prouct Size-</option>
+                                                {% for productSize in productSizes %}
+                                                    <option value='{{ productSize.id }}'>{{ productSize.productSize }}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                        </div>
+
+                                    <div class="col-md-2 mb-4">
+
+                                            <select name="productColour" placeholder="Price" class="form-control">
+                                                <option>-Select Product Colour-</option>
+                                                {% for productColour in productColours %}
+                                                     <option value="{{productColour.id}}" data-img_src="{{productColour.colourImg}}"> {{productColour.productColour}}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                        </div>
+
+                                    <div class="col-md-2 mb-4">
+
+                                            <select name="productType" placeholder="Price" class="form-control">
+                                                <option>-Select Prouct Type-</option>
                                                 {% for productType in productTypes %}
                                                     <option value='{{ productType.id }}'>{{ productType.productType }}</option>
                                                 {% endfor %}
                                             </select>
 
                                         </div>
+
+
                                         <div class="col-md-3 mb-4">
                                             {{ productForm.vendor }}
                                         </div>
                                         <div class="col-md-3 mb-4">
                                             {{ productForm.img }}
+                                        </div>
+                                    <div class="col-md-2 mb-4">
+                                            {{ ShipmentForm.indPrice }}
+
+                                        </div>
+
+                                        <div class="col-md-2 mb-4">
+                                            {{ ShipmentForm.qty }}
                                         </div>
                                     </div>
 
@@ -163,14 +195,7 @@
                                 <div class="col-md-12 center">
                                     <div class="row">
 
-                                        <div class="col-md-2 mb-4">
-                                            {{ ShipmentForm.indPrice }}
 
-                                        </div>
-
-                                        <div class="col-md-2 mb-4">
-                                            {{ ShipmentForm.qty }}
-                                        </div>
 
                                         <div class="col-md-2 mb-4">
                                             {{ ShipmentForm.billNumber }}
@@ -222,11 +247,9 @@
                                 </th>
                                 <th style="text-align: right; max-width:100%; word-wrap:break-word;">Image
                                 </th>
-                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
-                                    Number
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Colour
                                 </th>
-                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
-                                    Date
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Size
                                 </th>
                             </tr>
                             </thead>
@@ -259,8 +282,12 @@
                                     {% else %}
                                         <td></td>
                                     {% endif %}
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billNumber }}</td>
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billDate }}</td>
+
+<td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.colour }}
+
+
+                                    </td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.size }}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -383,11 +410,13 @@
 
     </script>
 
+
+
     <script>
 
         $(function () {
             //Initialize Select2 Elements
-            $('.select2').select2()
+            $('.select2').select2();
             $('#datepicker2').datepicker({autoclose: true,});
 
         })

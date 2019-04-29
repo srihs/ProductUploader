@@ -46,16 +46,26 @@ class CreateProductForm(forms.ModelForm):
                'required': 'true', 'placeholder': 'Product Type'}
     ))
 
+    productSize = forms.CharField(max_length=50, required=True, widget=forms.Select(
+        attrs={'class': 'form-control', 'id': 'productSize',
+               'required': 'true', 'placeholder': 'Size'}
+    ))
+
+    productColour = forms.CharField(max_length=50, required=True, widget=forms.Select(
+        attrs={'class': 'form-control', 'id': 'productSize',
+               'required': 'true', 'placeholder': 'Colour'}
+    ))
+
     class Meta:
         model = Products
         fields = ['sku', 'vendor', 'weight',
-                  'img', 'productType']
+                  'img', 'productType', 'productSize', 'productColour']
 
 
 class CreateShipmentDetails(forms.ModelForm):
     indPrice = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.NumberInput(
         attrs={'class': 'form-control', 'id': 'indPrice',
-               'required': 'true', 'placeholder': 'Ind. Price','min':1}
+               'required': 'true', 'placeholder': 'Price','min':1}
     ))
 
     qty = forms.DecimalField(max_digits=10, required=True, widget=forms.NumberInput(
