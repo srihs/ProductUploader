@@ -177,3 +177,94 @@ class ShipmentDetail(models.Model):
     def sellingPrice75(self):
         # Rounding upo to highest 10
         return int(math.ceil((Decimal(Decimal(self.cost) +  Decimal(self.cost * Decimal(0.75)))/10)))*10
+
+
+class CutomerType (models.Model):
+    id = models.AutoField(primary_key=True)
+    customerType = models.CharField(max_length=150)
+
+    class Meta:
+        verbose_name_plural = "CustomerTypes"
+
+    def __str__(self):
+        return self.customerType
+
+
+class Customer(models.Model):
+    id = models.AutoField(primary_key=True)
+    customerFirstName = models.CharField(max_length=150, null=True, blank=True)
+    customerLastName = models.CharField(max_length=150, null=True, blank=True)
+    customerAddress1 = models.CharField(max_length=150, null=True, blank=True)
+    customerAddress2 = models.CharField(max_length=150, null=True, blank=True)
+    customerAddress3 = models.CharField(max_length=150, null=True, blank=True)
+    customerPhone = models.CharField(max_length=150, null=True, blank=True)
+    customerWhatsApp = models.CharField(max_length=150, null=True, blank=True)
+    customerEmail = models.CharField(max_length=150, null=True, blank=True)
+    type = models.ForeignKey(CutomerType, on_delete=models.CASCADE)
+    archived = models.BooleanField(default='False')
+    dateCreated = models.DateTimeField(auto_now_add=True)
+    userCreated = models.CharField(max_length=500)
+    dateModified = models.DateTimeField(auto_now=True)
+    userModified = models.CharField(max_length=500)
+
+    class Meta:
+        verbose_name_plural = "Customers"
+
+    def __str__(self):
+        return self.customerFirstName
+
+
+# This will return the next invoice number
+def increment_invoice_number():
+    last_invoice = Invoice.objects.all().order_by('id').last()
+    if not last_invoice:
+        return 'INV000001'
+    invoice_no = last_invoice.invoice_no
+    invoice_int = int(invoice_no.split('INV')[-1])
+    new_invoice_int = invoice_int + 1
+    new_invoice_no = 'INV' + str(new_invoice_int)
+    return new_invoice_no
+
+
+class Invoice(models.Model):
+    id = models.AutoField(primary_key=True)
+    invoiceNumber = models.CharField(max_length=500, default=increment_invoice_number, null=True, blank=True)
+    customerID = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    invoiceDate = models.DateField(default=timezone.now)
+    archived = models.BooleanField(default='False')
+    dateCreated = models.DateTimeField(auto_now_add=True)
+    userCreated = models.CharField(max_length=500)
+    dateModified = models.DateTimeField(auto_now=True)
+    userModified = models.CharField(max_length=500)
+
+    class Meta:
+        verbose_name_plural = "Invoices"
+
+    def __str__(self):
+        return self.invoiceNumber
+
+
+class InvoiceDetail(models.Model):
+    id = models.AutoField(primary_key=True)
+    InvoiceId = models.ForeignKey(Invoice, on_delete=models.CASCADE)
+    ProductId = models.ForeignKey(Products, on_delete=models.CASCADE)
+    ProductName = models.CharField(max_length=500)
+    Qty = models.PositiveIntegerField(null=True, blank=True)
+    unitPrice = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
+    LineTotal = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True)
+    archived = models.BooleanField(default='False')
+    dateCreated = models.DateTimeField(auto_now_add=True)
+    userCreated = models.CharField(max_length=500)
+    dateModified = models.DateTimeField(auto_now=True)
+    userModified = models.CharField(max_length=500)
+
+    class Meta:
+        verbose_name_plural = "InvoiceDetails"
+
+    def __str__(self):
+        return self.id
+
+
+

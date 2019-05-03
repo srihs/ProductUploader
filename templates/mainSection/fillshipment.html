@@ -140,6 +140,17 @@
 
                                         </div>
 
+                                    <div class="col-md-2 mb-4">
+
+                                            <select name="productBrand" class="form-control">
+                                                <option>-Select Prouct Brand-</option>
+                                                {% for productSize in productSizes %}
+                                                    <option value='{{ productSize.id }}'>{{ productSize.productSize }}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                        </div>
+
                                         <div class="col-md-2 mb-4">
 
                                             <select name="productSize" placeholder="Price" class="form-control">

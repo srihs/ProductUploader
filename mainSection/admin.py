@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Shipment, Products, ProductTypes, User, Country, ProductColour, ProductSize, ProducBrands
+from .models import Shipment, Products, ProductTypes, User, Country, ProductColour, ProductSize, ProducBrands, CutomerType
 
 
 admin.site.register(Shipment)
@@ -9,6 +9,7 @@ admin.site.register(ProductTypes)
 admin.site.register(ProductColour)
 admin.site.register(ProductSize)
 admin.site.register(ProducBrands)
+admin.site.register(CutomerType)
 
 
 admin.site.register(Country)
