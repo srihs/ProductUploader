@@ -179,7 +179,7 @@ class ShipmentDetail(models.Model):
         return int(math.ceil((Decimal(Decimal(self.cost) +  Decimal(self.cost * Decimal(0.75)))/10)))*10
 
 
-class CutomerType (models.Model):
+class CustomerType (models.Model):
     id = models.AutoField(primary_key=True)
     customerType = models.CharField(max_length=150)
 
@@ -192,6 +192,7 @@ class CutomerType (models.Model):
 
 class Customer(models.Model):
     id = models.AutoField(primary_key=True)
+    customerNumber = models.CharField(max_length=150, null=True, blank=True)
     customerFirstName = models.CharField(max_length=150, null=True, blank=True)
     customerLastName = models.CharField(max_length=150, null=True, blank=True)
     customerAddress1 = models.CharField(max_length=150, null=True, blank=True)
@@ -200,7 +201,9 @@ class Customer(models.Model):
     customerPhone = models.CharField(max_length=150, null=True, blank=True)
     customerWhatsApp = models.CharField(max_length=150, null=True, blank=True)
     customerEmail = models.CharField(max_length=150, null=True, blank=True)
-    type = models.ForeignKey(CutomerType, on_delete=models.CASCADE)
+    customerCompany = models.CharField(max_length=150, null=True, blank=True)
+    customerType = models.ForeignKey(CustomerType, on_delete=models.CASCADE, null=True, blank=True)
+    creditPeriod = models.PositiveIntegerField(null=True, blank=True)
     archived = models.BooleanField(default='False')
     dateCreated = models.DateTimeField(auto_now_add=True)
     userCreated = models.CharField(max_length=500)
@@ -211,7 +214,7 @@ class Customer(models.Model):
         verbose_name_plural = "Customers"
 
     def __str__(self):
-        return self.customerFirstName
+        return self.customerNumber
 
 
 # This will return the next invoice number

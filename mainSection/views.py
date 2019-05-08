@@ -7,8 +7,8 @@ from django.template.loader import render_to_string
 from decimal import *
 from django.utils import timezone
 from .decorators import office_required
-from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm, sellingPriceForm, GRNForm
-from .models import Shipment, ProductTypes, ShipmentDetail, Country, Products, ProductSize, ProductColour, ProducBrands
+from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm, sellingPriceForm, GRNForm, CustomerForm
+from .models import Shipment, ProductTypes, ShipmentDetail, Country, Products, ProductSize, ProductColour, ProducBrands, Customer, CustomerType
 
 # global variables
 shipment_list = None
@@ -294,7 +294,7 @@ def saveproduct(request):
                 productObj = form.save(commit=False)
                 productObj.types = productType # assigning the product Type
                 productObj.productImg = request.FILES['img']  # assigning the product image.
-                productObj.size= productSize
+                productObj.size = productSize
                 productObj.colour = productColour
                 productObj.brand = productBrand
                 productObj.userCreated = request.user
@@ -610,3 +610,37 @@ def closeshipment(request):
 
     return redirect('mainSection:grnstore')
 
+
+@login_required
+def loadCustomer(request):
+    customer_list = Customer.objects.filter(archived='0')
+    customerTypes_list = CustomerType.objects.all()
+    nextId =0
+
+    if request.method == 'GET':
+        # Setting Customer Number
+        try:
+            nextId = Customer.objects.all().count()  # trying to retrive the next primaryKey
+            nextId += 1
+        except:
+            nextId = 1  # if the next ID is null define the record as the first
+
+    form = CustomerForm(initial={'customerNumber': 'CUS-000' + str(nextId), 'creditPeriod' : '0'})
+    return render(request, '../templates/mainSection/createcustomer.html', {'form': form, 'customers': customer_list, 'customerTypes': customerTypes_list})
+
+
+@login_required
+def savecustomers(request):
+    if request.method == 'POST':
+        cusType = get_object_or_404(CustomerType, pk=request.POST.get('ddcustomerType'))
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            objCustomer = form.save(commit=False)
+            print(objCustomer)
+            objCustomer.userCreated = request.user
+            objCustomer.customerType = cusType
+            objCustomer.save()
+        else:
+            messages.error(request, form.errors)
+
+    return redirect('mainSection:loadCustomer')

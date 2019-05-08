@@ -1,10 +1,237 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
 
-</body>
-</html>
+
+{% block content %}
+
+
+
+
+    <section class="content">
+        <!-- Main content -->
+
+        <div class="box box-solid box-default">
+            <div class="box-header with-border">
+                <h1 class="box-title">
+                    <strong> Customers </strong></h1> - Create/Edit Customer -
+                <div class="box-tools pull-right">
+                </div><!-- /.box-tools -->
+            </div><!-- /.box-header -->
+            <div class="box-body">
+                {% if messages %}
+                    <div class="row">
+                        <div style="margin-left:auto; margin-right:auto;">
+                            {% for message in messages %}
+                                <div {% if message.tags %}
+                                    class="alert alert-{{ message.tags }} alert-dismissible"{% endif %}>
+                                    <a href="" style="text-decoration:none" class="close" data-dismiss="alert"
+                                       aria-label="close">&times;</a>
+
+                                    <p>{{ message }}</p>
+                                </div>
+                                </div>
+                            {% endfor %}
+
+                    </div>
+                {% endif %}
+                <form id='frmCreateCustomer' method="POST" action="{% url 'mainSection:savecustomers' %}">
+                    {% csrf_token %}
+                    <div class="box box-solid box-primary">
+                        <div class="box-header with-border">
+                            <h1 class="box-title">Create Customer</h1>
+
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                            <!-- /.box-tools -->
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div class="row" style="margin-left:auto; margin-right:auto; margin-top: 2em">
+                                <div class="col-md-2 mb-4">
+                                    {{ form.customerNumber }}
+
+                                </div>
+                                <div class="col-md-2 mb-4">
+                                    {{ form.customerFirstName }}
+
+                                </div>
+
+                                <div class="col-md-2 mb-4">
+                                    {{ form.customerLastName }}
+                                </div>
+
+
+                                <div class="col-md-2 mb-4">
+                                    {{ form.customerCompany }}
+
+                                </div>
+
+                                <div class="col-md-2 mb-4">
+                                    {{ form.customerPhone }}
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    {{ form.customerAddress1 }}
+                                </div>
+
+                                <div class="col-md-3 mb-4">
+                                    {{ form.customerAddress2 }}
+                                </div>
+
+                                <div class="col-md-3 mb-4">
+                                    {{ form.customerAddress3 }}
+                                </div>
+
+
+                                <div class="col-md-2 mb-4">
+                                    {{ form.customerWhatsApp }}
+                                </div>
+                                <div class="col-md-2 mb-4">
+                                    {{ form.customerEmail }}
+                                </div>
+                                <div class="col-md-2 mb-4">
+                                    <select name="ddcustomerType" class="form-control">
+                                        <option>-Select Customer Type-</option>
+                                        {% for customerType in customerTypes %}
+                                            <option value='{{ customerType.id }}'>{{ customerType.customerType }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2 mb-4">
+                                    {{ form.creditPeriod }}
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <button style="margin-left:auto;  font-size: 14px;" type="submit" id="btnAddItem"
+                                            class="btn btn-primary">
+                                        Add Customer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <div class="box">
+                        <div class="box-body table-responsive ">
+
+                            <table id="tblCustomer" class="hover" style="width:100%">
+                                <thead>
+                                <tr>
+
+                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;"> Customer
+                                        Number
+                                    </th>
+                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">
+                                    </th>
+                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">Customer Name
+                                    </th>
+                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">Customer Type
+                                    </th>
+                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">Company Name
+                                    </th>
+                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">Phone Number
+                                    </th>
+                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">WhatsApp Number
+                                    </th>
+
+
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {% for shipmentdetail in shipmentDetails %}
+                                    <tr>
+
+                                        <td><a href="{% url 'mainSection:deleteshipmentdetail' shipmentdetail.id %}"
+                                               class="text-danger"
+                                               onclick="return confirm('You are about to delete. Are you sure?')">
+                                            <i class="fa fa-times-circle"></i>
+
+                                        </a></td>
+                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.sku }}</td>
+                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.brand }}</td>
+                                        {% if shipmentdetail.product.productImg %}
+                                            <td>
+                                                <p style="text-align:right"><img
+                                                        src="{{ shipmentdetail.product.productImg.url }}"
+                                                        width="100px;"></p>
+                                            </td>
+                                        {% else %}
+                                            <td></td>
+                                        {% endif %}
+                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.types }}</td>
+                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.colour }}
+                                        </td>
+                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.size }}</td>
+
+                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.weight }}</td>
+                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.indPrice|intcomma }}</td>
+                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.qty|intcomma }}</td>
+                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.totalAmount|intcomma }}</td>
+
+                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.vendor }}</td>
+
+
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tfoot>
+
+                                </tfoot>
+                            </table>
+
+                        </div>
+                    </div>
+                </form>
+
+                <!-- end of the Grid section -->
+            </div><!-- /.box-body -->
+            <div class="box-footer">
+
+            </div><!-- box-footer -->
+
+        </div>
+
+
+    </section>
+    <!-- /.content -->
+
+{% endblock content %}
+
+
+{% block scripts %}
+    <script src="{% static '/js/select2.full.min.js' %}"></script>
+    <script src="{% static '/js/jquery.dataTables.min.js' %}"></script>
+
+    <script>
+        // This funtion is related to Datagrid Table
+        $(function () {
+
+            $('#tblCustomer').DataTable({
+                'paging': true,
+                'searching': false,
+                'ordering': true,
+                'info': true,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                'autoWidth': true
+            })
+        });
+
+        $(function () {
+            //Initialize Select2 Elements
+            $('.select2').select2()
+            //Date picker - Two lines is to set the default date.
+            $("#datepicker").datepicker("setDate", new Date());
+            $('#datepicker').datepicker({autoclose: true,});
+
+        })
+    </script>
+
+    <script>
+        $('#frmCreateCost').submit(function () {
+            document.getElementById("loading").style.display = "visible";
+        });
+    </script>
+{% endblock scripts %}
