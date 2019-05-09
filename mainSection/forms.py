@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ImageField
 from django.db import models
-from .models import Shipment, Products ,ShipmentDetail
+from .models import Shipment, Products ,ShipmentDetail, Customer
 
 
 # CreateShipmentForm
@@ -46,16 +46,26 @@ class CreateProductForm(forms.ModelForm):
                'required': 'true', 'placeholder': 'Product Type'}
     ))
 
+    productSize = forms.CharField(max_length=50, required=True, widget=forms.Select(
+        attrs={'class': 'form-control', 'id': 'productSize',
+               'required': 'true', 'placeholder': 'Size'}
+    ))
+
+    productColour = forms.CharField(max_length=50, required=True, widget=forms.Select(
+        attrs={'class': 'form-control', 'id': 'productSize',
+               'required': 'true', 'placeholder': 'Colour'}
+    ))
+
     class Meta:
         model = Products
         fields = ['sku', 'vendor', 'weight',
-                  'img', 'productType']
+                  'img', 'productType', 'productSize', 'productColour']
 
 
 class CreateShipmentDetails(forms.ModelForm):
     indPrice = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.NumberInput(
         attrs={'class': 'form-control', 'id': 'indPrice',
-               'required': 'true', 'placeholder': 'Ind. Price','min':1}
+               'required': 'true', 'placeholder': 'Price','min':1}
     ))
 
     qty = forms.DecimalField(max_digits=10, required=True, widget=forms.NumberInput(
@@ -112,5 +122,64 @@ class GRNForm(forms.ModelForm):
         fields = ['receivedQty']
 
 
+class CustomerForm(forms.ModelForm):
+    customerNumber = forms.CharField(max_length=10, required=True, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'readonly': 'true',
+               'placeholder': 'Customer Number'}))
+
+    customerFirstName = forms.CharField(max_length=150, required=True, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'id': 'customerFirstName',
+                'placeholder': 'First Name'}
+    ))
+
+    customerLastName = forms.CharField(max_length=150, required=True, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'id': 'customerLastName',
+                'placeholder': 'Last Name'}
+    ))
+
+    customerAddress1 = forms.CharField(max_length=150, required=True, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'id': 'customerAddress1',
+               'placeholder': 'Address Line 1'}
+    ))
+
+    customerAddress2 = forms.CharField(max_length=150, required=True, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'id': 'customerAddress2',
+                'placeholder': 'Address Line 2'}
+    ))
+
+    customerAddress3 = forms.CharField(max_length=150, required=False, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'id': 'customerAddress3',
+                'placeholder': 'Address Line 3'}
+    ))
+
+    customerPhone = forms.CharField(max_length=10, required=True, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'id': 'customerPhone',
+                'placeholder': 'Phone'}
+    ))
+
+    customerWhatsApp = forms.CharField(max_length=50, required=False, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'id': 'customerWhatsApp',
+                'placeholder': 'WhatsApp number'}
+    ))
+
+    customerEmail = forms.CharField(max_length=50, required=False, widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'id': 'customerEmail',
+                'placeholder': 'Email'}
+    ))
+
+    customerCompany = forms.CharField(max_length=150, required=False, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'id': 'customerCompany',
+                'placeholder': 'Comany'}
+    ))
+
+    creditPeriod = forms.IntegerField(widget=forms.NumberInput(
+        attrs={'class': 'form-control', 'id': 'creditPeriod', 'required': 'false',
+               'placeholder': 'Credit Period', 'min': 0}
+    ))
+
+    class Meta:
+        model = Customer
+        fields = ['customerFirstName', 'customerLastName', 'customerAddress1', 'customerAddress2', 'customerAddress3', 'customerPhone',
+                  'customerWhatsApp', 'customerEmail', 'customerCompany', 'customerType', 'customerNumber', 'customerNumber', 'creditPeriod']
     
 

@@ -164,11 +164,13 @@
                                 </th>
                                 <th style="text-align: right; max-width:100%; word-wrap:break-word;">Image
                                 </th>
-                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
-                                    Number
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Colour
                                 </th>
-                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
-                                    Date
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Size
+                                </th>
+                                  <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill Number
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill Date
                                 </th>
                             </tr>
                             </thead>
@@ -196,7 +198,9 @@
                                     {% else %}
                                         <td></td>
                                     {% endif %}
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billNumber }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.colour }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.size }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billNumber}}</td>
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billDate }}</td>
                                 </tr>
                             {% endfor %}

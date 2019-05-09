@@ -129,7 +129,7 @@
                                   method="POST"
                                   enctype="multipart/form-data">
                                 {% csrf_token %}
-                                <div class="col-md-12 center">
+                                <div class="col-md-18 center">
                                     <div class="row">
                                         <div class="col-md-2 mb-4">
                                             {{ productForm.sku }}
@@ -139,31 +139,59 @@
                                             {{ productForm.weight }}
 
                                         </div>
+<div class="col-md-2 mb-4">
 
-                                        <div class="col-md-2 mb-4">
-
-                                            <select name="productType" placeholder="Ind Price" class="form-control">
-                                                <option>-Select-</option>
+                                            <select name="productType" placeholder="Price" class="form-control">
+                                                <option>-Select Prouct Type-</option>
                                                 {% for productType in productTypes %}
                                                     <option value='{{ productType.id }}'>{{ productType.productType }}</option>
                                                 {% endfor %}
                                             </select>
 
                                         </div>
-                                        <div class="col-md-3 mb-4">
-                                            {{ productForm.vendor }}
+                                    <div class="col-md-2 mb-4">
+
+                                            <select name="productBrand" class="form-control">
+                                                <option>-Select Prouct Brand-</option>
+                                                {% for productBrand in productBrands %}
+                                                    <option value='{{ productBrand.id }}'>{{ productBrand.productBrand }}</option>
+                                                {% endfor %}
+                                            </select>
+
                                         </div>
-                                        <div class="col-md-3 mb-4">
-                                            {{ productForm.img }}
+
+                                        <div class="col-md-2 mb-4">
+
+                                            <select name="productSize" placeholder="Price" class="form-control">
+                                                <option>-Select Prouct Size-</option>
+                                                {% for productSize in productSizes %}
+                                                    <option value='{{ productSize.id }}'>{{ productSize.productSize }}</option>
+                                                {% endfor %}
+                                            </select>
+
                                         </div>
-                                    </div>
+
+                                    <div class="col-md-2 mb-4">
+
+                                            <select name="productColour" placeholder="Price" class="form-control">
+                                                <option>-Select Product Colour-</option>
+                                                {% for productColour in productColours %}
+                                                     <option value="{{productColour.id}}" data-img_src="{{productColour.colourImg}}"> {{productColour.productColour}}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                        </div>
 
                                 </div>
 
-                                <div class="col-md-12 center">
                                     <div class="row">
-
+                                <div class="col-md-2 mb-4">
+                                            {{ productForm.vendor }}
+                                        </div>
                                         <div class="col-md-2 mb-4">
+                                            {{ productForm.img }}
+                                        </div>
+                                    <div class="col-md-2 mb-4">
                                             {{ ShipmentForm.indPrice }}
 
                                         </div>
@@ -179,14 +207,14 @@
                                         <div class="col-md-2 mb-4">
                                             {{ ShipmentForm.billDate }}
                                         </div>
-                                        <div class="col-md-4 mb-4">
-                                            <button type="submit" id="btnAddItem" class="btn btn-primary"
-                                                    style="font-size: 14px;">
+                                    </div>
+                                <div class="col-md-12 center">
+                                    <div class="row">
+                                            <button style="margin-left:auto;  font-size: 14px;" type="submit" id="btnAddItem" class="btn btn-primary">
                                                 Add Product
                                             </button>
-                                        </div>
                                     </div>
-
+                                    </div>
                                 </div>
 
                             </form>
@@ -195,7 +223,8 @@
                     <!-- /.box-body -->
                 </div>
                 <div class="box">
-                    <div class="box-body">
+                    <div class="box-body table-responsive ">
+
                         <table id="tblProduct" class="hover" style="width:100%">
                             <thead>
                             <tr>
@@ -204,8 +233,17 @@
                                 </th>
                                 <th style="text-align: right; max-width:100%; word-wrap:break-word;">SKU
                                 </th>
-                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Type
+                                 <th style="text-align: right; max-width:100%; word-wrap:break-word;">Brand
                                 </th>
+                                 <th style="text-align: right; max-width:100%; word-wrap:break-word;">Image
+                                </th>
+                                 <th style="text-align: right; max-width:100%; word-wrap:break-word;">Type
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Colour
+                                </th>
+                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Size
+                                </th>
+
                                 <th style="text-align: right; max-width:100%; word-wrap:break-word;">Weight
                                     (gms)
                                 </th>
@@ -220,14 +258,7 @@
                                 <th style="text-align: right; max-width:100%; word-wrap:break-word;">
                                     Vendor
                                 </th>
-                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Image
-                                </th>
-                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
-                                    Number
-                                </th>
-                                <th style="text-align: right; max-width:100%; word-wrap:break-word;">Bill
-                                    Date
-                                </th>
+
                             </tr>
                             </thead>
                             <tbody>
@@ -242,14 +273,7 @@
 
                                     </a></td>
                                     <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.sku }}</td>
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.types }}</td>
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.weight }}</td>
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.indPrice|intcomma }}</td>
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.qty|intcomma }}</td>
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.totalAmount|intcomma }}</td>
-
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.vendor }}</td>
-
+                                 <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.brand }}</td>
                                     {% if shipmentdetail.product.productImg %}
                                         <td>
                                             <p style="text-align:right"><img
@@ -259,8 +283,21 @@
                                     {% else %}
                                         <td></td>
                                     {% endif %}
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billNumber }}</td>
-                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.billDate }}</td>
+                                 <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.types }}</td>
+                                <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.colour }}
+                                    </td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.size }}</td>
+
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.weight }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.indPrice|intcomma }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.qty|intcomma }}</td>
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.totalAmount|intcomma }}</td>
+
+                                    <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.vendor }}</td>
+
+
+
+
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -268,7 +305,8 @@
 
                             </tfoot>
                         </table>
-                    </div>
+
+                </div>
                 </div>
 
                 <!-- /.box-body -->
@@ -383,11 +421,13 @@
 
     </script>
 
+
+
     <script>
 
         $(function () {
             //Initialize Select2 Elements
-            $('.select2').select2()
+            $('.select2').select2();
             $('#datepicker2').datepicker({autoclose: true,});
 
         })

@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'shadesProductUploader.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'productUploader',
+        'NAME': 'prodUpload',
         'USER': 'root',
         'PASSWORD': 'Im@liem123#',
         #'PASSWORD': 'KaV*sjs6IiE7', Production Pass

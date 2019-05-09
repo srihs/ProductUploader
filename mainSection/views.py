@@ -7,8 +7,8 @@ from django.template.loader import render_to_string
 from decimal import *
 from django.utils import timezone
 from .decorators import office_required
-from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm, sellingPriceForm, GRNForm
-from .models import Shipment, ProductTypes, ShipmentDetail, Country, Products
+from .forms import CreateShipmentForm, CreateProductForm, CreateShipmentDetails, CreateCostFactorForm, sellingPriceForm, GRNForm, CustomerForm
+from .models import Shipment, ProductTypes, ShipmentDetail, Country, Products, ProductSize, ProductColour, ProducBrands, Customer, CustomerType
 
 # global variables
 shipment_list = None
@@ -155,20 +155,28 @@ def reviewShipment(request):
         # session variable therefor need to check for null.
         elif request.method == 'GET' and request is not None and 'shipmentID' in request.session and request.session[
             'shipmentID'] is not None:
+            print('here')
+
             shipmentItem_list = getShipmentItemsList(request.session['shipmentID'])
             selectedShipment = Shipment.objects.get(
                 id=request.session['shipmentID'])
 
-            for shipment in shipmentItem_list:
-                shipmentTotal += shipment.totalAmount
-                shipmentTotalQty += shipment.qty
-                shippingWeight += shipment.weight * shipment.qty
 
-            shippingWeightKG = shippingWeight / 1000
+
         else:
-
             shipmentItem_list = None
             selectedShipment = None
+
+        if(shipmentItem_list is not None):
+         for shipment in shipmentItem_list:
+            shipmentTotal += shipment.totalAmount
+            shipmentTotalQty += shipment.qty
+            shippingWeight += shipment.weight * shipment.qty
+
+        shippingWeightKG = shippingWeight / 1000
+        print(shipmentTotal)
+        print(shipmentTotalQty)
+        print(shippingWeight)
 
         return render(request, '../templates/mainSection/reviewshipment.html',
                       {'shipments': shipment_list, 'shipmentDetails': shipmentItem_list, 'shipmentTotal': shipmentTotal,
@@ -227,6 +235,10 @@ def fillshipment(request):
         initial={'sku': productCode + '-000' + str(nextId)})  # creating the form with the product ID
 
     productType_list = ProductTypes.objects.all()     # Retrieving The Product types for the ShipmentForm
+    productsize_list = ProductSize.objects.all()  # Retreving all prouct Sizes
+    productColor_list = ProductColour.objects.all()  # Retreving all prouct Sizes
+    productBrand_list = ProducBrands.objects.all()  # Retreving all prouct Brands
+
     shipment_list = Shipment.objects.filter(
         isClosed='False', isFinalized='0', buyer=request.user)     # Retrieving The shipments which are open to fill. Only loged in users orders will be listed.
 
@@ -249,7 +261,7 @@ def fillshipment(request):
         selectedShipment = None
 
     return render(request, '../templates/mainSection/fillshipment.html',
-                  {'selectedShipment': selectedShipment, 'productTypes': productType_list, 'shipments': shipment_list,
+                  {'selectedShipment': selectedShipment, 'productBrands': productBrand_list,  'productColours': productColor_list, 'productTypes': productType_list, 'productSizes': productsize_list, 'shipments': shipment_list,
                    'productForm': productForm, 'shipmentDetails': shipmentItem_list,
                    'ShipmentForm': shipmentDetailForm})
 
@@ -266,13 +278,25 @@ def saveproduct(request):
         productType = get_object_or_404(
             ProductTypes, pk=request.POST['productType'])  # loading the product type that was assigned to the product
 
+        productSize = get_object_or_404(
+            ProductSize, pk=request.POST['productSize'])
+
+        productColour = get_object_or_404(
+            ProductColour, pk=request.POST['productColour'])
+
+        productBrand = get_object_or_404(
+            ProducBrands, pk=request.POST['productBrand'])
+
         shipmentID = request.session['shipmentID']   # loading the ShipmentID
 
         try:
             if form.is_valid() and shipmentDetialForm.is_valid():
                 productObj = form.save(commit=False)
                 productObj.types = productType # assigning the product Type
-                productObj.productImg = request.FILES['img']  # assigning the product image
+                productObj.productImg = request.FILES['img']  # assigning the product image.
+                productObj.size = productSize
+                productObj.colour = productColour
+                productObj.brand = productBrand
                 productObj.userCreated = request.user
                 productObj.save()
 
@@ -545,19 +569,17 @@ def updateproductgrn(request, pk):
             objShipmentDetail.is_grn = True
             objShipmentDetail.userUpdated = str(request.user.username)
 
-
             if int(objShipmentDetail.receivedQty) < int(objShipmentDetail.qty):
                 objShipmentDetail.is_completeReceive = False
-                messages.warning(request, "Item Received qty is less than the shipped Qty. If this is a mistake you can edit again and correct it.")
+                messages.warning(request, "Item Received qty is less than the shipped Qty. "
+                                          "If this is a mistake you can edit again and correct it.")
 
             if int(objShipmentDetail.receivedQty) > int(objShipmentDetail.qty):
                 objShipmentDetail.is_completeReceive = False
                 messages.warning(request,"Item Received qty is greater than the shipped Qty. ")
-                objShipmentDetail.is_completeReceive = True
             else:
-                 objShipmentDetail.save()
-
-
+                objShipmentDetail.is_completeReceive = True
+                objShipmentDetail.save()
     else:
         objShipmentDetail = ShipmentDetail.objects.get(pk=pk)
         form = GRNForm(instance=objShipmentDetail)
@@ -588,3 +610,37 @@ def closeshipment(request):
 
     return redirect('mainSection:grnstore')
 
+
+@login_required
+def loadCustomer(request):
+    customer_list = Customer.objects.filter(archived='0')
+    customerTypes_list = CustomerType.objects.all()
+    nextId =0
+
+    if request.method == 'GET':
+        # Setting Customer Number
+        try:
+            nextId = Customer.objects.all().count()  # trying to retrive the next primaryKey
+            nextId += 1
+        except:
+            nextId = 1  # if the next ID is null define the record as the first
+
+    form = CustomerForm(initial={'customerNumber': 'CUS-000' + str(nextId), 'creditPeriod' : '0'})
+    return render(request, '../templates/mainSection/createcustomer.html', {'form': form, 'customers': customer_list, 'customerTypes': customerTypes_list})
+
+
+@login_required
+def savecustomers(request):
+    if request.method == 'POST':
+        cusType = get_object_or_404(CustomerType, pk=request.POST.get('ddcustomerType'))
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            objCustomer = form.save(commit=False)
+            print(objCustomer)
+            objCustomer.userCreated = request.user
+            objCustomer.customerType = cusType
+            objCustomer.save()
+        else:
+            messages.error(request, form.errors)
+
+    return redirect('mainSection:loadCustomer')
