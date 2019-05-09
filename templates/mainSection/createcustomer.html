@@ -120,20 +120,20 @@
                                 <thead>
                                 <tr>
 
-                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;"> Customer
+                                    <th style="text-align: center; max-width:100%; word-wrap:break-word;"> Customer
                                         Number
                                     </th>
-                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">
+                                    <th style="text-align: center; max-width:100%; word-wrap:break-word;">Customer Name
                                     </th>
-                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">Customer Name
+                                    <th style="text-align: center; max-width:100%; word-wrap:break-word;">Customer Type
                                     </th>
-                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">Customer Type
+                                    <th style="text-align: center; max-width:100%; word-wrap:break-word;">Credit Period
                                     </th>
-                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">Company Name
+                                    <th style="text-align: center; max-width:100%; word-wrap:break-word;">Company Name
                                     </th>
-                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">Phone Number
+                                    <th style="text-align: center; max-width:100%; word-wrap:break-word;">Phone Number
                                     </th>
-                                    <th style="text-align: right; max-width:100%; word-wrap:break-word;">WhatsApp Number
+                                    <th style="text-align: center; max-width:100%; word-wrap:break-word;">WhatsApp Number
                                     </th>
 
 
@@ -141,37 +141,36 @@
                                 </thead>
                                 <tbody>
 
-                                {% for shipmentdetail in shipmentDetails %}
+                                {% for customer in customers %}
                                     <tr>
-
-                                        <td><a href="{% url 'mainSection:deleteshipmentdetail' shipmentdetail.id %}"
-                                               class="text-danger"
-                                               onclick="return confirm('You are about to delete. Are you sure?')">
-                                            <i class="fa fa-times-circle"></i>
-
-                                        </a></td>
-                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.sku }}</td>
-                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.brand }}</td>
-                                        {% if shipmentdetail.product.productImg %}
-                                            <td>
-                                                <p style="text-align:right"><img
-                                                        src="{{ shipmentdetail.product.productImg.url }}"
-                                                        width="100px;"></p>
+                                        <td style="text-align: center; max-width:100%; word-wrap:break-word;">{{ customer.customerNumber }}</td>
+                                        <td style="text-align: center; max-width:100%; word-wrap:break-word;">{{ customer.customerFirstName }} {{ customer.customerLastName }}</td>
+                                        <td style="text-align: center; max-width:100%; word-wrap:break-word;">{{ customer.customerType }}</td>
+                                        {% if customer.creditPeriod %}
+                                            <td style="text-align: center; max-width:100%; word-wrap:break-word;">
+                                                {{ customer.creditPeriod }}
                                             </td>
                                         {% else %}
-                                            <td></td>
+                                            <td style="text-align: center; max-width:100%; word-wrap:break-word;"> -</td>
                                         {% endif %}
-                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.types }}</td>
-                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.colour }}
-                                        </td>
-                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.size }}</td>
 
-                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.weight }}</td>
-                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.indPrice|intcomma }}</td>
-                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.qty|intcomma }}</td>
-                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.totalAmount|intcomma }}</td>
+                                    {% if customer.customerCompany %}
+                                            <td style="text-align: center; max-width:100%; word-wrap:break-word;">
+                                                {{ customer.customerCompany }}
+                                            </td>
+                                        {% else %}
+                                            <td style="text-align: center; max-width:100%; word-wrap:break-word;"> -</td>
+                                        {% endif %}
+                                        <td style="text-align: center; max-width:100%; word-wrap:break-word;">{{ customer.customerPhone }}</td>
 
-                                        <td style="text-align: right; max-width:100%; word-wrap:break-word;">{{ shipmentdetail.product.vendor }}</td>
+                                     {% if customer.customerWhatsApp  %}
+                                            <td style="text-align: center; max-width:100%; word-wrap:break-word;">
+                                                {{ customer.customerWhatsApp  }}
+                                            </td>
+                                        {% else %}
+                                            <td style="text-align: center; max-width:100%; word-wrap:break-word;"> -</td>
+                                        {% endif %}
+
 
 
                                     </tr>
